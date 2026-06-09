@@ -2,6 +2,41 @@
 
 [Visit Data Archives Page](https://tracinginsights.com/data)
 
+## Analysis Dashboards (GitHub Pages)
+
+Interactive analyses built from this data are published at:
+
+**https://garyhukkeri.github.io/F1-2026/**
+
+The landing page lists every dashboard and links to it. Each dashboard is a
+self-contained interactive ECharts page for one session (e.g. Monaco GP Race).
+
+### How it works
+
+- Working dashboards live in `visualizations/*.html`.
+- `scripts/build_pages.py` scans that folder and generates the published site
+  into `docs/` (a landing `index.html` + copies of each dashboard + `.nojekyll`).
+- GitHub Pages serves the `docs/` folder of the `gary-main` branch
+  ("Deploy from a branch" mode).
+
+### Publish / refresh the site
+
+After adding or updating a dashboard in `visualizations/`, rebuild and push:
+
+```bash
+python3 scripts/build_pages.py
+git add docs && git commit -m "rebuild pages" && git push origin gary-main
+```
+
+The index is regenerated from `visualizations/` on every build, so new analyses
+appear automatically — no manual editing of `index.html` required.
+
+### One-time setup
+
+In **Settings → Pages → Build and deployment**, set **Source** to
+**Deploy from a branch**, **Branch** to **`gary-main`**, and **Folder** to
+**`/docs`**.
+
 What kind of data is available in these repositories? 
 
 Our repositories contain various types of Formula 1 data including:

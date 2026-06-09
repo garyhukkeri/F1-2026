@@ -71,9 +71,6 @@ instance/
 # Sphinx documentation
 docs/_build/
 
-# GitHub Pages build output
-_site/
-
 # PyBuilder
 .pybuilder/
 target/

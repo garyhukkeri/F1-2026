@@ -2,10 +2,14 @@
 """Build the GitHub Pages site for F1 2026 analyses.
 
 Scans ``visualizations/*.html`` (the interactive dashboards produced by the
-f1-analytics workflow), copies them into the output directory, and generates a
-landing ``index.html`` that lists and links to each one. The index is derived
-from the dashboards on every build, so it stays current as new analyses are
-added — no manual editing required.
+f1-analytics workflow), copies them into ``docs/`` (the folder GitHub Pages
+serves from in "Deploy from a branch" mode), and generates a landing
+``docs/index.html`` that lists and links to each one. The index is derived from
+the dashboards on every build, so it stays current as new analyses are added.
+
+Run this after adding/updating a dashboard, then commit ``docs/``:
+
+    python3 scripts/build_pages.py && git add docs && git commit -m "rebuild site"
 """
 
 import html
@@ -16,7 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "visualizations"
-OUT = ROOT / "_site"
+OUT = ROOT / "docs"
 
 TITLE_RE = re.compile(r"<title>(.*?)</title>", re.IGNORECASE | re.DOTALL)
 TITLE_PREFIX = re.compile(r"^\s*F1\s*2026\s*[—\-–:]\s*", re.IGNORECASE)
@@ -55,6 +59,9 @@ def build():
     if OUT.exists():
         shutil.rmtree(OUT)
     (OUT / "visualizations").mkdir(parents=True)
+
+    # Tell GitHub Pages to serve files as-is (skip Jekyll processing).
+    (OUT / ".nojekyll").write_text("", encoding="utf-8")
 
     cards = []
     for path in dashboards:

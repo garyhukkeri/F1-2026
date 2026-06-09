@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>F1 2026 — Analysis Dashboards</title>
+  <style>
+    :root { --red: #e10600; --bg: #1a1a2e; --card: #24243e; --muted: #8a8aa3; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: #eee; }
+    header { padding: 48px 24px 24px; max-width: 1200px; margin: 0 auto; }
+    h1 { color: var(--red); font-size: 34px; margin: 0 0 6px; }
+    .lede { color: var(--muted); font-size: 15px; margin: 0; }
+    main { max-width: 1200px; margin: 0 auto; padding: 0 24px 64px; }
+    .event { margin-top: 40px; }
+    .event h2 { font-size: 20px; color: #fff; border-bottom: 1px solid #333; padding-bottom: 8px; margin-bottom: 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .card { display: flex; flex-direction: column; gap: 8px; background: var(--card); border: 1px solid #33334e; border-left: 3px solid var(--red); border-radius: 10px; padding: 18px 20px; text-decoration: none; color: inherit; transition: transform .12s ease, border-color .12s ease, background .12s ease; }
+    .card:hover { transform: translateY(-2px); border-color: var(--red); background: #2c2c4a; }
+    .card-title { font-size: 16px; font-weight: 600; color: #fff; }
+    .card-file { font-size: 12px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    footer { max-width: 1200px; margin: 0 auto; padding: 24px; color: #555; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>F1 2026 — Analysis Dashboards</h1>
+    <p class="lede">4 interactive dashboards. Click any card to open the full analysis.</p>
+  </header>
+  <main>
+      <section class="event">
+        <h2>Australian Grand Prix</h2>
+        <div class="grid">
+        <a class="card" href="visualizations/australian-gp-fp1.html">
+          <span class="card-title">Australian Grand Prix Practice 1</span>
+          <span class="card-file">australian-gp-fp1.html</span>
+        </a>
+        </div>
+      </section>
+      <section class="event">
+        <h2>Chinese Grand Prix</h2>
+        <div class="grid">
+        <a class="card" href="visualizations/chinese-gp-race.html">
+          <span class="card-title">Chinese Grand Prix Race</span>
+          <span class="card-file">chinese-gp-race.html</span>
+        </a>
+        </div>
+      </section>
+      <section class="event">
+        <h2>Monaco Grand Prix</h2>
+        <div class="grid">
+        <a class="card" href="visualizations/monaco-gp-race.html">
+          <span class="card-title">Monaco Grand Prix Race</span>
+          <span class="card-file">monaco-gp-race.html</span>
+        </a>
+        </div>
+      </section>
+      <section class="event">
+        <h2>Other Analyses</h2>
+        <div class="grid">
+        <a class="card" href="visualizations/ham-aus-vs-chn-race.html">
+          <span class="card-title">HAM: Australian GP vs Chinese GP Race Comparison</span>
+          <span class="card-file">ham-aus-vs-chn-race.html</span>
+        </a>
+        </div>
+      </section>
+  </main>
+  <footer>Generated 2026-06-09 11:01 UTC · built from <code>visualizations/</code></footer>
+</body>
+</html>

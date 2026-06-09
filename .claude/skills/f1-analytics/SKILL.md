@@ -143,7 +143,9 @@ All charts go through ECharts in HTML.
 5. **Prepare chart data** — extract clean lists/dicts for ECharts
 6. **Update the session dashboard** — create it if new, append a section if it exists
 7. **Serve & open browser** — start HTTP server if needed, navigate to that file
-8. **Optionally save notes** — `analysis/<descriptive-name>.md` for written findings
+8. **Rebuild the published site** — run `python3 scripts/build_pages.py` so the
+   GitHub Pages index picks up the new/updated dashboard (see "Publishing" below)
+9. **Optionally save notes** — `analysis/<descriptive-name>.md` for written findings
 
 ---
 
@@ -251,6 +253,29 @@ Replace `{Event}` and `{Session}` with the real names (e.g. `Australian Grand Pr
 ```bash
 open http://localhost:8000/visualizations/australian-gp-race.html
 ```
+
+---
+
+## Publishing (GitHub Pages)
+
+The dashboards are published at **https://garyhukkeri.github.io/F1-2026/** via
+GitHub Pages ("Deploy from a branch" → `gary-main` → `/docs`).
+
+- `visualizations/*.html` are the working dashboards (what you edit).
+- `scripts/build_pages.py` regenerates the published `docs/` folder: a landing
+  `index.html` (auto-listed from `visualizations/`), copies of every dashboard,
+  and a `.nojekyll` marker.
+
+**After creating or updating any dashboard, always rebuild and commit the site:**
+
+```bash
+python3 scripts/build_pages.py
+git add docs && git commit -m "rebuild pages" && git push origin gary-main
+```
+
+Never hand-edit `docs/index.html` or files under `docs/` — they are generated.
+Edit `visualizations/` and rerun the build instead. Add new dashboards only to
+`visualizations/`; the index updates itself on the next build.
 
 ---
 

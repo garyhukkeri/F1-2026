@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>F1 2026 — Chinese Grand Prix Race</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <style>
+    body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; }
+    h1 { color: #e10600; font-size: 28px; margin-bottom: 4px; }
+    .subtitle { color: #aaa; font-size: 13px; margin-bottom: 40px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .analysis-section { margin-bottom: 60px; padding-bottom: 40px; border-bottom: 1px solid #333; }
+    .analysis-section:last-child { border-bottom: none; }
+    .section-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .section-timestamp { color: #666; font-size: 11px; margin-bottom: 20px; }
+    .chart-label { font-size: 15px; font-weight: 500; color: #ccc; margin-bottom: 10px; }
+    .chart { width: 100%; height: 500px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>F1 2026 — Chinese Grand Prix Race</h1>
+    <div class="subtitle">Interactive analysis dashboard</div>
+    <div id="analytics-content">
+<div class="analysis-section" id="analysis-20260316185622">
+  <div class="section-title">Hamilton vs Antonelli — Average Speed by Segment</div>
+  <div class="section-timestamp">Generated: 2026-03-16 18:56:22 · Chinese GP Race · All valid clean laps</div>
+
+  <div class="chart-label">Corner Speeds (km/h)</div>
+  <div id="chart-corners-20260316185622" class="chart"></div>
+
+  <div class="chart-label" style="margin-top:40px">Straight Speeds (km/h)</div>
+  <div id="chart-straights-20260316185622" class="chart"></div>
+
+  <div class="chart-label" style="margin-top:40px">Speed Delta — Hamilton minus Antonelli (km/h) · Red = HAM faster · Teal = ANT faster</div>
+  <div id="chart-delta-20260316185622" class="chart" style="height:380px"></div>
+</div>
+<script>
+(function() {
+  // ── Corners ──────────────────────────────────────────────────────────────
+  var cChart = echarts.init(document.getElementById('chart-corners-20260316185622'), 'dark');
+  cChart.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' },
+      formatter: function(p) {
+        return p[0].name + '<br>'
+          + '<span style="color:#E8002D">●</span> Hamilton: ' + p[0].value + ' km/h<br>'
+          + '<span style="color:#27F4D2">●</span> Antonelli: ' + p[1].value + ' km/h';
+      }
+    },
+    legend: { data: ['Hamilton', 'Antonelli'], top: 8 },
+    toolbox: { feature: { saveAsImage: {}, dataZoom: {} } },
+    grid: { left: 65, right: 20, bottom: 70, top: 50 },
+    xAxis: { type: 'category', data: ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12", "T13", "T14", "T15", "T16"],
+              axisLabel: { rotate: 0, fontSize: 12 } },
+    yAxis: { type: 'value', name: 'km/h',
+              min: function(v) { return Math.floor(v.min * 0.97); },
+              nameTextStyle: { color: '#aaa' } },
+    series: [
+      { name: 'Hamilton',  type: 'bar', barGap: '5%',
+         data: [233.6, 129.7, 99.8, 166.7, 267.9, 143.1, 244.9, 195.4, 159.9, 171.0, 221.6, 110.3, 200.4, 207.3, 137.8, 194.9], itemStyle: { color: '#E8002D' } },
+      { name: 'Antonelli', type: 'bar', barGap: '5%',
+         data: [252.6, 161.6, 112.9, 157.4, 268.7, 147.6, 244.8, 201.6, 165.9, 169.0, 229.9, 121.2, 189.9, 234.3, 132.2, 194.1], itemStyle: { color: '#27F4D2' } }
+    ]
+  });
+  window.addEventListener('resize', () => cChart.resize());
+
+  // ── Straights ─────────────────────────────────────────────────────────────
+  var sChart = echarts.init(document.getElementById('chart-straights-20260316185622'), 'dark');
+  sChart.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' },
+      formatter: function(p) {
+        return p[0].name + '<br>'
+          + '<span style="color:#E8002D">●</span> Hamilton: ' + p[0].value + ' km/h<br>'
+          + '<span style="color:#27F4D2">●</span> Antonelli: ' + p[1].value + ' km/h';
+      }
+    },
+    legend: { data: ['Hamilton', 'Antonelli'], top: 8 },
+    toolbox: { feature: { saveAsImage: {}, dataZoom: {} } },
+    grid: { left: 65, right: 20, bottom: 100, top: 50 },
+    xAxis: { type: 'category', data: ["S16\u21921", "S4\u21925", "S6\u21927", "S10\u219211", "S13\u219214", "S16\u21921"],
+              axisLabel: { rotate: 35, fontSize: 11 } },
+    yAxis: { type: 'value', name: 'km/h',
+              min: function(v) { return Math.floor(v.min * 0.97); },
+              nameTextStyle: { color: '#aaa' } },
+    series: [
+      { name: 'Hamilton',  type: 'bar', barGap: '5%',
+         data: [285.1, 256.5, 243.5, 254.1, 306.9, 285.1], itemStyle: { color: '#E8002D' } },
+      { name: 'Antonelli', type: 'bar', barGap: '5%',
+         data: [277.7, 251.8, 238.5, 251.7, 307.6, 277.7], itemStyle: { color: '#27F4D2' } }
+    ]
+  });
+  window.addEventListener('resize', () => sChart.resize());
+
+  // ── Delta (all segments) ──────────────────────────────────────────────────
+  var dChart = echarts.init(document.getElementById('chart-delta-20260316185622'), 'dark');
+  var allSegs   = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12", "T13", "T14", "T15", "T16", "S16\u21921", "S4\u21925", "S6\u21927", "S10\u219211", "S13\u219214", "S16\u21921"];
+  var allDeltas = [-19.0, -31.9, -13.1, 9.3, -0.8, -4.5, 0.1, -6.2, -6.0, 2.0, -8.3, -10.9, 10.5, -27.0, 5.6, 0.8, 7.4, 4.7, 5.0, 2.4, -0.7, 7.4];
+  var dColors   = ["#27F4D2", "#27F4D2", "#27F4D2", "#E8002D", "#27F4D2", "#27F4D2", "#E8002D", "#27F4D2", "#27F4D2", "#E8002D", "#27F4D2", "#27F4D2", "#E8002D", "#27F4D2", "#E8002D", "#E8002D", "#E8002D", "#E8002D", "#E8002D", "#E8002D", "#27F4D2", "#E8002D"];
+  dChart.setOption({
+    tooltip: {
+      trigger: 'axis',
+      formatter: function(p) {
+        var v = p[0].value;
+        var who = v >= 0 ? 'Hamilton +' : 'Antonelli +';
+        return p[0].name + '<br>' + who + Math.abs(v).toFixed(1) + ' km/h';
+      }
+    },
+    toolbox: { feature: { saveAsImage: {} } },
+    grid: { left: 65, right: 20, bottom: 100, top: 30 },
+    xAxis: { type: 'category', data: allSegs,
+              axisLabel: { rotate: 35, fontSize: 11 } },
+    yAxis: { type: 'value', name: 'Δ km/h', nameTextStyle: { color: '#aaa' } },
+    series: [{
+      type: 'bar',
+      data: allDeltas.map(function(v, i) {
+        return { value: v, itemStyle: { color: dColors[i] } };
+      }),
+      markLine: {
+        silent: true,
+        lineStyle: { color: '#888', type: 'dashed' },
+        data: [{ yAxis: 0 }]
+      }
+    }]
+  });
+  window.addEventListener('resize', () => dChart.resize());
+
+  document.getElementById('analysis-20260316185622').scrollIntoView({ behavior: 'smooth' });
+})();
+</script>
+
+    <!-- ANALYTICS-END --></div>
+  </div>
+</body>
+</html>
