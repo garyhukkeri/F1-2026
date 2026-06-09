@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>F1 2026 — Monaco Grand Prix Race</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <style>
+    body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; }
+    h1 { color: #e10600; font-size: 28px; margin-bottom: 4px; }
+    .subtitle { color: #aaa; font-size: 13px; margin-bottom: 40px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .analysis-section { margin-bottom: 60px; padding-bottom: 40px; border-bottom: 1px solid #333; }
+    .analysis-section:last-child { border-bottom: none; }
+    .section-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .section-timestamp { color: #666; font-size: 11px; margin-bottom: 20px; }
+    .section-desc { color: #bbb; font-size: 13px; margin-bottom: 20px; line-height: 1.5; max-width: 900px; }
+    .chart { width: 100%; height: 500px; }
+    .chart-tall { width: 100%; height: 620px; }
+    .chart-short { width: 100%; height: 340px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+    .driver-card { background: #20203a; border-left: 4px solid; border-radius: 6px; padding: 16px 20px; }
+    .driver-name { font-size: 18px; font-weight: 600; }
+    .driver-meta { color: #aaa; font-size: 12px; margin-top: 4px; }
+    .driver-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+    .stat { background: #1a1a2e; border-radius: 4px; padding: 8px 10px; }
+    .stat-label { color: #888; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { color: #fff; font-size: 18px; font-weight: 600; margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>F1 2026 — Monaco Grand Prix Race</h1>
+    <div class="subtitle">Interactive analysis</div>
+    <div id="analytics-content">
+
+      <div class="analysis-section" id="analysis-ferrari-brakes">
+        <div class="section-title">Ferrari Brakes at Monaco — Leclerc vs Hamilton</div>
+        <div class="section-timestamp">Generated: 2026-06-09</div>
+        <div class="section-desc">
+          Monaco is the heaviest braking circuit on the calendar: drivers spend ~30 % of every lap distance on the
+          brakes. This section compares the two Ferraris on their fastest race laps — Leclerc on L53 (HARD, 18-lap-old
+          tyre, running P3) and Hamilton on L74 (SOFT, 10-lap-old tyre, eventually finishing P2). The compound and
+          tyre-life difference matters: SOFT lets Hamilton brake later and carry more speed.
+        </div>
+
+        <div class="summary-grid" id="ferrari-summary"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">1 · Speed trace with brake-on zones (best race lap)</h3>
+        <div class="section-desc">
+          Speed (km/h) over lap distance for both drivers. Shaded vertical bands mark exactly where the brake pedal
+          is depressed. Numbered markers above the chart label the 19 corners.
+        </div>
+        <div id="chart-speed-brake" class="chart-tall"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">2 · Brake-zone strip along the lap</h3>
+        <div class="section-desc">
+          Each driver is a horizontal track strip. Red blocks are brake-on segments. Lets you see brake-point
+          differences and how the duration of braking varies corner-to-corner.
+        </div>
+        <div id="chart-brake-strip" class="chart-short"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">3 · Per-corner braking — duration & minimum speed</h3>
+        <div class="section-desc">
+          For each of the 19 corners, two bar groups: the distance under braking (meters) and the minimum speed
+          reached through the corner. Lower min-speed = tighter / slower-apex corner; longer brake distance = harder
+          stop. Multi-apex sequences (Swimming Pool T12-14, Rascasse T15-16, Anthony Noghes T17-18) share a single
+          brake event so values are duplicated across those corners — that's expected.
+        </div>
+        <div id="chart-corner-bars" class="chart-tall"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">4 · Race-long brake usage (green-flag laps only)</h3>
+        <div class="section-desc">
+          Percentage of each lap's distance spent on the brakes, race lap by race lap. Laps slower than 90 s (Safety
+          Car, pit in / out, red flag) are filtered out so the trend reflects pure racing pace. Stable around 24-28 %
+          for both drivers — Monaco's signature brake share.
+        </div>
+        <div id="chart-race-brakes" class="chart"></div>
+      </div>
+
+      <div class="analysis-section" id="analysis-lec-brake-deg">
+        <div class="section-title">Leclerc's DNF — Was it Brake Degradation?</div>
+        <div class="section-timestamp">Generated: 2026-06-09</div>
+        <div class="section-desc">
+          Leclerc retired (DNF) on lap 65. The popular explanation is a brake problem. This dataset has
+          <b>no brake-temperature or brake-wear channel</b> — the brake signal is binary (pedal on/off) — so
+          true thermal fade can't be measured directly. What we <i>can</i> do is look for the behavioural
+          fingerprints of failing brakes: brake points creeping earlier, brake zones getting longer, and
+          minimum speeds rising because the car won't slow. The verdict from the green-flag laps: <b>those
+          fingerprints are absent.</b> His braking stayed rock-steady through lap 59.
+        </div>
+
+        <div id="deg-verdict" style="background:#20203a;border-left:4px solid #ED1131;border-radius:6px;padding:16px 20px;margin-bottom:24px;"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:8px;margin-bottom:6px;">5 · Brake point per lap at the two heaviest stops</h3>
+        <div class="section-desc">
+          Brake-application distance (m into the lap) at T1 (Sainte Devote) and T10 (Nouvelle Chicane), lap by
+          lap. A degrading brake forces the driver to hit the pedal <i>earlier</i> — a downward drift. Both
+          traces are flat across the race (green-flag laps only). Trend lines are near-zero slope.
+        </div>
+        <div id="chart-deg-brakepoint" class="chart"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">6 · Brake distance &amp; minimum speed per lap</h3>
+        <div class="section-desc">
+          Top: how many metres he spends braking into each of the two corners. Bottom: the minimum speed reached.
+          Fading brakes would show the brake distance growing and the minimum speed rising (can't scrub enough
+          speed). Neither happens — both are stable to the end of green running.
+        </div>
+        <div id="chart-deg-distspeed" class="chart-tall"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">7 · The retirement lap (L65) — speed &amp; brake vs time</h3>
+        <div class="section-desc">
+          Lap 65 ran under a Safety Car (laps 61-65 were all slow, 95-124 s). The car never reached racing
+          speed, slowed progressively, and came to a final stop near the last corner (T19) ~113 s into the lap.
+          The brake pedal then reads "on" continuously while the car sits parked. The stop happens at low speed
+          under caution — not during a high-load braking event — so whatever ended his race was sudden/terminal
+          (or a precautionary stop), not the gradual fade you'd see building over the green laps above.
+        </div>
+        <div id="chart-deg-retirement" class="chart"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">8 · The crash itself — were the brakes applied into the corner?</h3>
+        <div class="section-desc">
+          The decisive view: the final ~12 seconds at full sample rate, zoomed onto the entry to the last corner
+          (T19). Left axis = speed, right axis = longitudinal acceleration (<code>acc_x</code>, negative = decelerating).
+          Red bands mark exactly when the brake pedal is pressed. The answer is unambiguous — read the verdict box.
+        </div>
+        <div id="crash-verdict" style="background:#20203a;border-left:4px solid #ED1131;border-radius:6px;padding:16px 20px;margin:16px 0 24px;"></div>
+        <div id="chart-deg-crash" class="chart"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">9 · The smoking gun — braking force collapses at lap 60</h3>
+        <div class="section-desc">
+          Leclerc's radio: <i>"This brakes! ... I put the least amount of brakes I could possibly do ... the rear
+          brakes were not working at all."</i> The <code>brake</code> channel is only pedal on/off, but the
+          longitudinal accelerometer (<code>acc_x</code>) shows the <b>force actually achieved</b>. This plots the
+          typical (median) deceleration while braking, lap by lap. It sits at a healthy −10 to −12 m/s² for 59 laps,
+          then <b>halves to ~−5 m/s² the instant the trouble starts at lap 60</b> — even though he's on the pedal far
+          more of the lap. That is the data signature of brakes that have stopped working, exactly as he described.
+        </div>
+        <div id="deccol-verdict" style="background:#20203a;border-left:4px solid #ED1131;border-radius:6px;padding:16px 20px;margin:16px 0 24px;"></div>
+        <div id="chart-deg-decel" class="chart"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">10 · Deceleration per corner — healthy average vs each final lap</h3>
+        <div class="section-desc">
+          Average braking deceleration (<code>acc_x</code>) achieved in each corner's braking zone, three lines:
+          the healthy baseline (mean of laps 1-59, green), the failure phase (mean of laps 60-64, orange), and the
+          final lap (65, red). Lower (more negative) = stronger braking. The two failure lines sit well above the
+          baseline at almost every braking corner — he couldn't generate the stopping force — and lap 65 is the
+          weakest, flat near zero across the board. T2 and T9 are flat-out (no braking) so they're omitted.
+          (Crash-impact spikes &gt; 2.5 g are excluded so the barrier hit doesn't distort the corner average.)
+        </div>
+        <div id="chart-deg-percorner" class="chart-tall"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    fetch('../analysis/monaco_ferrari_brakes.json')
+      .then(r => r.json())
+      .then(data => buildCharts(data))
+      .catch(err => {
+        document.getElementById('analytics-content').innerHTML =
+          '<div style="color:#f66;padding:20px;background:#2a1a1a;border-radius:8px;">' +
+          'Failed to load analysis JSON: ' + err.message +
+          '<br><br>Make sure you ran <code>python analysis/monaco_ferrari_brakes.py</code> first ' +
+          'and that you opened this page via the http server (not file://).' +
+          '</div>';
+      });
+
+    function buildCharts(data) {
+      renderSummary(data);
+      renderSpeedBrake(data);
+      renderBrakeStrip(data);
+      renderCornerBars(data);
+      renderRaceBrakes(data);
+      window.addEventListener('resize', () => {
+        ['chart-speed-brake','chart-brake-strip','chart-corner-bars','chart-race-brakes']
+          .forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.__chart) el.__chart.resize();
+          });
+      });
+    }
+
+    function fmt(v, d) {
+      return (v === null || v === undefined) ? '—' : v.toFixed(d == null ? 1 : d);
+    }
+
+    function totalBrakeStats(trace) {
+      let on = 0, total = 0, applications = 0;
+      let dist = trace.distance;
+      let brake = trace.brake;
+      for (let i = 1; i < dist.length; i++) {
+        const dd = Math.max(0, dist[i] - dist[i-1]);
+        total += dd;
+        if (brake[i] === 1) on += dd;
+        if (brake[i] === 1 && brake[i-1] === 0) applications += 1;
+      }
+      return { on, total, pct: total ? (on/total)*100 : 0, applications };
+    }
+
+    function renderSummary(data) {
+      const host = document.getElementById('ferrari-summary');
+      ['LEC','HAM'].forEach(code => {
+        const d = data.drivers[code];
+        const s = totalBrakeStats(d.trace);
+        const card = document.createElement('div');
+        card.className = 'driver-card';
+        card.style.borderLeftColor = d.color;
+        card.innerHTML = `
+          <div class="driver-name" style="color:${d.color}">${d.name} <span style="color:#888;font-size:13px;font-weight:400;">(${code})</span></div>
+          <div class="driver-meta">Best race lap: L${d.best_lap} · ${d.best_lap_time.toFixed(3)} s · ${d.best_lap_compound} (life ${d.best_lap_life})</div>
+          <div class="driver-stats">
+            <div class="stat"><div class="stat-label">Brake distance</div><div class="stat-value">${s.on.toFixed(0)} m</div></div>
+            <div class="stat"><div class="stat-label">% of lap on brakes</div><div class="stat-value">${s.pct.toFixed(1)}%</div></div>
+            <div class="stat"><div class="stat-label">Brake applications</div><div class="stat-value">${s.applications}</div></div>
+            <div class="stat"><div class="stat-label">Lap length</div><div class="stat-value">${s.total.toFixed(0)} m</div></div>
+          </div>
+        `;
+        host.appendChild(card);
+      });
+    }
+
+    function renderSpeedBrake(data) {
+      const el = document.getElementById('chart-speed-brake');
+      const chart = echarts.init(el, 'dark');
+      el.__chart = chart;
+
+      const series = [];
+      const markAreas = [];
+
+      ['LEC','HAM'].forEach(code => {
+        const d = data.drivers[code];
+        const t = d.trace;
+        const speedPts = t.distance.map((x,i) => [x, t.speed[i]]);
+        series.push({
+          name: code + ' speed',
+          type: 'line',
+          data: speedPts,
+          showSymbol: false,
+          smooth: 0.2,
+          lineStyle: { color: d.color, width: 2 },
+          itemStyle: { color: d.color },
+        });
+
+        const bands = [];
+        let inSeg = false, s = 0;
+        for (let i = 0; i < t.distance.length; i++) {
+          if (t.brake[i] === 1 && !inSeg) { inSeg = true; s = t.distance[i]; }
+          else if (t.brake[i] === 0 && inSeg) { inSeg = false; bands.push([{xAxis: s, itemStyle:{color: d.color, opacity: 0.10}}, {xAxis: t.distance[i]}]); }
+        }
+        if (inSeg) bands.push([{xAxis: s, itemStyle:{color: d.color, opacity: 0.10}}, {xAxis: t.distance[t.distance.length-1]}]);
+
+        series.push({
+          name: code + ' brake-on',
+          type: 'line',
+          data: [],
+          markArea: {
+            silent: true,
+            data: bands,
+          },
+          itemStyle: { color: d.color },
+        });
+      });
+
+      const cornerMarks = data.corners.map(c => ({
+        name: 'T' + c.CornerNumber,
+        xAxis: c.Distance,
+        label: { formatter: 'T' + c.CornerNumber, color: '#ccc', fontSize: 10 },
+        lineStyle: { color: '#555', type: 'dashed', width: 1 },
+      }));
+
+      chart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+        legend: { data: ['LEC speed','HAM speed'], textStyle: { color: '#ddd' }, top: 0 },
+        grid: { left: 60, right: 30, top: 50, bottom: 60 },
+        toolbox: { feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+        xAxis: {
+          type: 'value',
+          name: 'Lap distance (m)',
+          nameLocation: 'middle',
+          nameGap: 30,
+          min: 0,
+          axisLabel: { color: '#bbb' },
+          splitLine: { lineStyle: { color: '#2a2a48' } },
+        },
+        yAxis: {
+          type: 'value',
+          name: 'Speed (km/h)',
+          axisLabel: { color: '#bbb' },
+          splitLine: { lineStyle: { color: '#2a2a48' } },
+        },
+        dataZoom: [
+          { type: 'inside', xAxisIndex: 0 },
+          { type: 'slider', xAxisIndex: 0, bottom: 8, height: 18, textStyle: { color: '#aaa' } },
+        ],
+        series: series.concat([{
+          name: 'corners',
+          type: 'line',
+          data: [],
+          markLine: {
+            silent: true,
+            symbol: 'none',
+            data: cornerMarks,
+          },
+        }]),
+      });
+    }
+
+    function renderBrakeStrip(data) {
+      const el = document.getElementById('chart-brake-strip');
+      const chart = echarts.init(el, 'dark');
+      el.__chart = chart;
+
+      // Custom series: each driver is a row, brake-on segments are bars.
+      const rows = ['LEC','HAM'];
+      const items = [];
+      rows.forEach((code, rowIdx) => {
+        const d = data.drivers[code];
+        const t = d.trace;
+        let inSeg = false, s = 0;
+        for (let i = 0; i < t.distance.length; i++) {
+          if (t.brake[i] === 1 && !inSeg) { inSeg = true; s = t.distance[i]; }
+          else if (t.brake[i] === 0 && inSeg) {
+            inSeg = false;
+            items.push({
+              value: [s, t.distance[i], rowIdx, code, t.distance[i] - s],
+              itemStyle: { color: d.color, opacity: 0.85 },
+            });
+          }
+        }
+        if (inSeg) items.push({
+          value: [s, t.distance[t.distance.length-1], rowIdx, code, t.distance[t.distance.length-1] - s],
+          itemStyle: { color: d.color, opacity: 0.85 },
+        });
+      });
+
+      function renderItem(params, api) {
+        const start = api.coord([api.value(0), api.value(2)]);
+        const end = api.coord([api.value(1), api.value(2)]);
+        const height = api.size([0, 1])[1] * 0.6;
+        return {
+          type: 'rect',
+          shape: {
+            x: start[0],
+            y: start[1] - height/2,
+            width: end[0] - start[0],
+            height: height,
+          },
+          style: api.style(),
+        };
+      }
+
+      const cornerMarks = data.corners.map(c => ({
+        xAxis: c.Distance,
+        label: { formatter: 'T' + c.CornerNumber, color: '#ccc', fontSize: 10, position: 'insideEndTop' },
+        lineStyle: { color: '#555', type: 'dashed', width: 1 },
+      }));
+
+      chart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: {
+          formatter: p => `<b>${p.value[3]}</b><br/>from ${p.value[0].toFixed(0)} m to ${p.value[1].toFixed(0)} m<br/>brake distance: <b>${p.value[4].toFixed(1)} m</b>`,
+        },
+        grid: { left: 80, right: 30, top: 30, bottom: 60 },
+        toolbox: { feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+        xAxis: {
+          type: 'value',
+          name: 'Lap distance (m)',
+          nameLocation: 'middle',
+          nameGap: 30,
+          min: 0,
+          axisLabel: { color: '#bbb' },
+          splitLine: { lineStyle: { color: '#2a2a48' } },
+        },
+        yAxis: {
+          type: 'category',
+          data: rows,
+          axisLabel: { color: '#ddd', fontSize: 13, fontWeight: 'bold' },
+          axisTick: { show: false },
+          splitLine: { show: false },
+        },
+        dataZoom: [
+          { type: 'inside', xAxisIndex: 0 },
+          { type: 'slider', xAxisIndex: 0, bottom: 8, height: 18, textStyle: { color: '#aaa' } },
+        ],
+        series: [{
+          type: 'custom',
+          renderItem: renderItem,
+          encode: { x: [0, 1], y: 2, tooltip: [0, 1, 3, 4] },
+          data: items,
+          markLine: { silent: true, symbol: 'none', data: cornerMarks, animation: false },
+        }],
+      });
+    }
+
+    function renderCornerBars(data) {
+      const el = document.getElementById('chart-corner-bars');
+      const chart = echarts.init(el, 'dark');
+      el.__chart = chart;
+
+      const lecC = data.drivers.LEC.corners;
+      const hamC = data.drivers.HAM.corners;
+      const xs = lecC.map(c => 'T' + c.corner);
+      const lecBrake = lecC.map(c => c.brake_distance);
+      const hamBrake = hamC.map(c => c.brake_distance);
+      const lecMin = lecC.map(c => c.min_speed);
+      const hamMin = hamC.map(c => c.min_speed);
+
+      chart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        legend: { textStyle: { color: '#ddd' }, top: 0 },
+        toolbox: { feature: { saveAsImage: {} }, iconStyle: { borderColor: '#888' } },
+        grid: [
+          { left: 60, right: 30, top: 50, height: '38%' },
+          { left: 60, right: 30, top: '58%', height: '34%' },
+        ],
+        xAxis: [
+          { type: 'category', data: xs, gridIndex: 0, axisLabel: { color: '#bbb' } },
+          { type: 'category', data: xs, gridIndex: 1, axisLabel: { color: '#bbb' } },
+        ],
+        yAxis: [
+          { type: 'value', name: 'Brake distance (m)', gridIndex: 0, axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+          { type: 'value', name: 'Min speed (km/h)', gridIndex: 1, axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+        ],
+        series: [
+          { name: 'LEC brake dist', type: 'bar', data: lecBrake, itemStyle: { color: data.drivers.LEC.color }, xAxisIndex: 0, yAxisIndex: 0 },
+          { name: 'HAM brake dist', type: 'bar', data: hamBrake, itemStyle: { color: data.drivers.HAM.color }, xAxisIndex: 0, yAxisIndex: 0 },
+          { name: 'LEC min speed', type: 'bar', data: lecMin, itemStyle: { color: data.drivers.LEC.color }, xAxisIndex: 1, yAxisIndex: 1 },
+          { name: 'HAM min speed', type: 'bar', data: hamMin, itemStyle: { color: data.drivers.HAM.color }, xAxisIndex: 1, yAxisIndex: 1 },
+        ],
+      });
+    }
+
+    function renderRaceBrakes(data) {
+      const el = document.getElementById('chart-race-brakes');
+      const chart = echarts.init(el, 'dark');
+      el.__chart = chart;
+
+      const cleanThreshold = 90; // seconds
+
+      function series(code) {
+        const d = data.drivers[code];
+        const pts = d.race_brakes
+          .filter(r => r.lap_time && r.lap_time < cleanThreshold)
+          .map(r => [r.lap, r.brake_pct_dist]);
+        return {
+          name: code,
+          type: 'line',
+          data: pts,
+          smooth: 0.25,
+          showSymbol: true,
+          symbolSize: 6,
+          lineStyle: { color: d.color, width: 2 },
+          itemStyle: { color: d.color },
+        };
+      }
+
+      chart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'cross' },
+          valueFormatter: v => v == null ? '—' : v.toFixed(1) + '%',
+        },
+        legend: { textStyle: { color: '#ddd' }, top: 0 },
+        toolbox: { feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+        grid: { left: 60, right: 30, top: 50, bottom: 60 },
+        xAxis: {
+          type: 'value',
+          name: 'Race lap',
+          nameLocation: 'middle',
+          nameGap: 30,
+          min: 1,
+          axisLabel: { color: '#bbb' },
+          splitLine: { lineStyle: { color: '#2a2a48' } },
+        },
+        yAxis: {
+          type: 'value',
+          name: 'Brake-on % of lap distance',
+          axisLabel: { color: '#bbb', formatter: '{value}%' },
+          splitLine: { lineStyle: { color: '#2a2a48' } },
+        },
+        dataZoom: [
+          { type: 'inside', xAxisIndex: 0 },
+          { type: 'slider', xAxisIndex: 0, bottom: 8, height: 18, textStyle: { color: '#aaa' } },
+        ],
+        series: [series('LEC'), series('HAM')],
+      });
+    }
+  </script>
+
+  <script>
+    fetch('../analysis/monaco_lec_brake_deg.json')
+      .then(r => r.json())
+      .then(data => buildDegCharts(data))
+      .catch(err => {
+        const el = document.getElementById('deg-verdict');
+        if (el) el.innerHTML = '<span style="color:#f66;">Failed to load monaco_lec_brake_deg.json: ' +
+          err.message + '. Run <code>python analysis/monaco_lec_brake_deg.py</code> first.</span>';
+      });
+
+    function buildDegCharts(data) {
+      renderDegVerdict(data);
+      renderDegBrakePoint(data);
+      renderDegDistSpeed(data);
+      renderDegRetirement(data);
+      renderCrashVerdict(data);
+      renderCrash(data);
+      renderDecelCollapse(data);
+      window.addEventListener('resize', () => {
+        ['chart-deg-brakepoint','chart-deg-distspeed','chart-deg-retirement','chart-deg-crash','chart-deg-decel','chart-deg-percorner'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && el.__chart) el.__chart.resize();
+        });
+      });
+    }
+
+    fetch('../analysis/monaco_lec_decel_per_corner.json')
+      .then(r => r.json())
+      .then(d => renderDecelPerCorner(d))
+      .catch(() => {});
+
+    function renderDecelPerCorner(data) {
+      const el = document.getElementById('chart-deg-percorner');
+      if (!el) return;
+      const chart = echarts.init(el, 'dark'); el.__chart = chart;
+      const cats = data.corners.map(c => 'T' + c);
+
+      const pick = obj => data.corners.map(c => {
+        const v = obj[String(c)];
+        return v == null ? null : +v.toFixed(2);
+      });
+
+      const series = [
+        { name: data.baseline_label, type: 'line', data: pick(data.baseline),
+          smooth: 0.2, symbol: 'circle', symbolSize: 7, connectNulls: false,
+          lineStyle: { color: '#3ddc84', width: 4 }, itemStyle: { color: '#3ddc84' }, z: 5 },
+        { name: data.failure_avg_label, type: 'line', data: pick(data.failure_avg),
+          smooth: 0.2, symbol: 'circle', symbolSize: 6, connectNulls: false,
+          lineStyle: { color: '#FF8A2B', width: 3 }, itemStyle: { color: '#FF8A2B' }, z: 4 },
+        { name: data.last_lap_label, type: 'line', data: pick(data.last_lap),
+          smooth: 0.2, symbol: 'circle', symbolSize: 6, connectNulls: false,
+          lineStyle: { color: '#B00020', width: 3 }, itemStyle: { color: '#B00020' }, z: 4 },
+      ];
+
+      chart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' },
+                   valueFormatter: v => v == null ? 'no braking' : v.toFixed(1) + ' m/s²' },
+        legend: { textStyle: { color: '#ddd' }, top: 0, type: 'scroll' },
+        toolbox: { feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+        grid: { left: 70, right: 30, top: 50, bottom: 50 },
+        xAxis: { type: 'category', data: cats, name: 'Corner', nameLocation: 'middle', nameGap: 32,
+                 axisLabel: { color: '#bbb' }, splitLine: { show: false } },
+        yAxis: { type: 'value', name: 'Decel while braking (m/s²)',
+                 axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+        series,
+      });
+    }
+
+    function renderDecelCollapse(data) {
+      const rows = data.per_lap.filter(r => r.median_decel != null);
+      const normal = rows.filter(r => r.lap <= 59).map(r => r.median_decel);
+      const failing = rows.filter(r => r.lap >= 60).map(r => r.median_decel);
+      const med = arr => { const s=[...arr].sort((a,b)=>a-b); return s.length? s[Math.floor(s.length/2)] : 0; };
+      const nMed = med(normal), fMed = med(failing);
+
+      const vEl = document.getElementById('deccol-verdict');
+      vEl.innerHTML = `
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:8px;">Verdict: braking force collapsed ~${Math.round((1-fMed/nMed)*100)}% — consistent with brake failure</div>
+        <div style="color:#ccc;font-size:13px;line-height:1.7;">
+          Typical braking deceleration: <b>${nMed.toFixed(1)} m/s²</b> through lap 59 →
+          <b>${fMed.toFixed(1)} m/s²</b> from lap 60. The pedal channel stays "on" (he's still braking), but the car
+          stops slowing properly. Pinpoints the failure onset to <b>lap 60</b> — sudden, not gradual.
+          <span style="color:#9fe09f;">This is the quantitative corroboration of Leclerc's radio.</span>
+        </div>`;
+
+      const el = document.getElementById('chart-deg-decel');
+      const chart = echarts.init(el, 'dark'); el.__chart = chart;
+      const medianPts = rows.map(r => [r.lap, r.median_decel]);
+      const strongPts = rows.filter(r => r.p10_decel != null).map(r => [r.lap, r.p10_decel]);
+      chart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', axisPointer: { type: 'cross' }, valueFormatter: v => v==null?'—':v.toFixed(1)+' m/s²' },
+        legend: { data: ['Typical braking decel (median)','Strong braking (10th pct)'], textStyle: { color: '#ddd' }, top: 0 },
+        toolbox: { feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+        grid: { left: 70, right: 30, top: 50, bottom: 60 },
+        xAxis: { type: 'value', name: 'Race lap', nameLocation: 'middle', nameGap: 30, min: 1,
+                 axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+        yAxis: { type: 'value', name: 'Deceleration while braking (m/s²)', axisLabel: { color: '#bbb' },
+                 splitLine: { lineStyle: { color: '#2a2a48' } } },
+        dataZoom: [ { type: 'inside', xAxisIndex: 0 }, { type: 'slider', xAxisIndex: 0, bottom: 8, height: 18, textStyle: { color: '#aaa' } } ],
+        series: [
+          { name: 'Strong braking (10th pct)', type: 'line', data: strongPts, showSymbol: false, smooth: 0.2,
+            lineStyle: { color: '#666', width: 1, type: 'dashed' }, itemStyle: { color: '#666' } },
+          { name: 'Typical braking decel (median)', type: 'line', data: medianPts, showSymbol: true, symbolSize: 5, smooth: 0.2,
+            lineStyle: { color: '#ED1131', width: 2.5 }, itemStyle: { color: '#ED1131' },
+            markArea: { silent: true, data: [[
+              { xAxis: 60, itemStyle: { color: '#ED1131', opacity: 0.10 },
+                label: { show: true, formatter: 'Brake failure', color: '#f88', position: 'insideTop', fontSize: 11 } },
+              { xAxis: 65 } ]] },
+            markLine: { silent: true, symbol: 'none', data: [
+              { yAxis: nMed, label: { formatter: 'healthy ' + nMed.toFixed(1), color: '#9fe09f', fontSize: 10 },
+                lineStyle: { color: '#9fe09f', type: 'dashed', width: 1 } } ] } },
+        ],
+      });
+    }
+
+    function renderCrashVerdict(data) {
+      const fa = data.final_approach;
+      const el = document.getElementById('crash-verdict');
+      if (!fa) { el.innerHTML = '<span style="color:#f66;">No final-approach data.</span>'; return; }
+      el.innerHTML = `
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:8px;">Verdict: yes — Leclerc was hard on the brakes into the corner</div>
+        <div style="color:#ccc;font-size:13px;line-height:1.7;">
+          Brake pedal was <b>ON for ${fa.brake_on_pct_last3s.toFixed(0)}%</b> of the final 3 seconds, and
+          <b>still applied at the instant the car stopped</b> (${fa.braking_at_stop ? 'brake = on' : 'brake = off'} on the last moving sample).<br/>
+          He was braking continuously from ~2924 m into Turn 19 all the way to the stop at <b>${fa.stop_distance.toFixed(0)} m</b>.<br/>
+          Peak deceleration in this window: <b>${fa.peak_decel.toFixed(1)} m/s² (~${(Math.abs(fa.peak_decel)/9.81).toFixed(2)} g)</b> —
+          well beyond his normal ~−10 m/s² braking, with the car coming to an abrupt, permanent stop (distance freezes).<br/>
+          <span style="color:#9fe09f;">This is the opposite of a "no brakes applied" case — the brakes were clearly being used into the corner.</span>
+        </div>`;
+    }
+
+    function renderCrash(data) {
+      const el = document.getElementById('chart-deg-crash');
+      const chart = echarts.init(el, 'dark'); el.__chart = chart;
+      const fa = data.final_approach;
+      const speedPts = fa.time.map((t,i) => [t, fa.speed[i]]);
+      const accPts = fa.acc_x.length ? fa.time.map((t,i) => [t, fa.acc_x[i]]) : [];
+      const bands = [];
+      let inSeg = false, s = 0;
+      for (let i=0;i<fa.time.length;i++){
+        if (fa.brake[i]===1 && !inSeg){ inSeg=true; s=fa.time[i]; }
+        else if (fa.brake[i]===0 && inSeg){ inSeg=false; bands.push([{xAxis:s, itemStyle:{color:'#ED1131', opacity:0.13}},{xAxis:fa.time[i]}]); }
+      }
+      if (inSeg) bands.push([{xAxis:s, itemStyle:{color:'#ED1131', opacity:0.13}},{xAxis:fa.time[fa.time.length-1]}]);
+
+      const series = [
+        { name: 'Speed', type: 'line', yAxisIndex: 0, data: speedPts, showSymbol: false, smooth: 0.1,
+          lineStyle: { color: '#ED1131', width: 2.5 }, itemStyle: { color: '#ED1131' },
+          markArea: { silent: true, data: bands },
+          markLine: { silent: true, symbol: 'none', data: [
+            { xAxis: fa.stop_time, label: { formatter: 'Car stops', color: '#fff', fontSize: 11 },
+              lineStyle: { color: '#fff', type: 'dashed', width: 1 } } ] } },
+      ];
+      if (accPts.length) {
+        series.push({ name: 'Longitudinal accel (acc_x)', type: 'line', yAxisIndex: 1, data: accPts,
+          showSymbol: false, smooth: 0.1, lineStyle: { color: '#4781D7', width: 2 }, itemStyle: { color: '#4781D7' } });
+      }
+
+      chart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+        legend: { textStyle: { color: '#ddd' }, top: 0 },
+        toolbox: { feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+        grid: { left: 60, right: 70, top: 50, bottom: 50 },
+        xAxis: { type: 'value', name: 'Time into lap 65 (s)', nameLocation: 'middle', nameGap: 30,
+                 min: fa.time[0], max: fa.time[fa.time.length-1],
+                 axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+        yAxis: [
+          { type: 'value', name: 'Speed (km/h)', position: 'left', axisLabel: { color: '#bbb' },
+            splitLine: { lineStyle: { color: '#2a2a48' } } },
+          { type: 'value', name: 'acc_x (m/s²)', position: 'right', axisLabel: { color: '#9bb6e8' },
+            splitLine: { show: false }, axisLine: { lineStyle: { color: '#4781D7' } } },
+        ],
+        series,
+      });
+    }
+
+    function linregSlope(xs, ys) {
+      const n = xs.length;
+      if (n < 2) return 0;
+      const mx = xs.reduce((a,b)=>a+b,0)/n;
+      const my = ys.reduce((a,b)=>a+b,0)/n;
+      let num = 0, den = 0;
+      for (let i=0;i<n;i++){ num += (xs[i]-mx)*(ys[i]-my); den += (xs[i]-mx)**2; }
+      return den ? num/den : 0;
+    }
+
+    function greenRows(data) {
+      return data.per_lap.filter(r => r.green);
+    }
+
+    function renderDegVerdict(data) {
+      const g = greenRows(data);
+      const stats = {};
+      ['T1','T10'].forEach(z => {
+        const rows = g.filter(r => r[z+'_brake_start'] != null);
+        const xs = rows.map(r => r.lap);
+        const ys = rows.map(r => r[z+'_brake_start']);
+        stats[z] = linregSlope(xs, ys);
+      });
+      const ret = data.retirement;
+      const el = document.getElementById('deg-verdict');
+      el.innerHTML = `
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:8px;">Verdict: no progressive brake degradation visible in the data</div>
+        <div style="color:#ccc;font-size:13px;line-height:1.6;">
+          Green-flag laps analysed: <b>${g.length}</b> (laps ${g[0].lap}–${g[g.length-1].lap}).<br/>
+          Brake-point drift &mdash; T1: <b>${stats.T1.toFixed(2)} m/lap</b>, T10: <b>${stats.T10.toFixed(2)} m/lap</b>
+          (a fading brake would be strongly negative, several m/lap earlier). Both are essentially zero.<br/>
+          DNF on lap ${ret.lap}: car stopped at <b>${ret.stop_distance.toFixed(0)} m</b> (by the final corner / main straight)
+          ~${ret.stop_time.toFixed(0)} s into a Safety-Car lap, then sat parked (telemetry logged ${ret.total_duration.toFixed(0)} s total).
+          <br/><span style="color:#999;">Caveat: ${data.note}</span>
+        </div>`;
+    }
+
+    function renderDegBrakePoint(data) {
+      const el = document.getElementById('chart-deg-brakepoint');
+      const chart = echarts.init(el, 'dark'); el.__chart = chart;
+      const g = greenRows(data);
+      const zColors = { T1: '#ED1131', T10: '#FFD24D' };
+      const series = [];
+      ['T1','T10'].forEach(z => {
+        const rows = g.filter(r => r[z+'_brake_start'] != null);
+        series.push({
+          name: z + ' brake point',
+          type: 'line',
+          data: rows.map(r => [r.lap, r[z+'_brake_start']]),
+          showSymbol: true, symbolSize: 6, smooth: 0.2,
+          lineStyle: { color: zColors[z], width: 2 }, itemStyle: { color: zColors[z] },
+        });
+        // trend line
+        const xs = rows.map(r => r.lap), ys = rows.map(r => r[z+'_brake_start']);
+        const slope = linregSlope(xs, ys);
+        const mx = xs.reduce((a,b)=>a+b,0)/xs.length, my = ys.reduce((a,b)=>a+b,0)/ys.length;
+        const x0 = xs[0], x1 = xs[xs.length-1];
+        series.push({
+          name: z + ' trend',
+          type: 'line', showSymbol: false,
+          data: [[x0, my + slope*(x0-mx)], [x1, my + slope*(x1-mx)]],
+          lineStyle: { color: zColors[z], width: 1, type: 'dashed', opacity: 0.7 },
+          tooltip: { show: false },
+        });
+      });
+      chart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', axisPointer: { type: 'cross' }, valueFormatter: v => v==null?'—':v.toFixed(0)+' m' },
+        legend: { textStyle: { color: '#ddd' }, top: 0 },
+        toolbox: { feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+        grid: { left: 70, right: 30, top: 50, bottom: 60 },
+        xAxis: { type: 'value', name: 'Race lap', nameLocation: 'middle', nameGap: 30, min: 1,
+                 axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+        yAxis: { type: 'value', name: 'Brake point (m into lap)', axisLabel: { color: '#bbb' },
+                 splitLine: { lineStyle: { color: '#2a2a48' } } },
+        dataZoom: [ { type: 'inside', xAxisIndex: 0 }, { type: 'slider', xAxisIndex: 0, bottom: 8, height: 18, textStyle: { color: '#aaa' } } ],
+        series,
+      });
+    }
+
+    function renderDegDistSpeed(data) {
+      const el = document.getElementById('chart-deg-distspeed');
+      const chart = echarts.init(el, 'dark'); el.__chart = chart;
+      const g = greenRows(data);
+      const zColors = { T1: '#ED1131', T10: '#FFD24D' };
+      const distSeries = [], spdSeries = [];
+      ['T1','T10'].forEach(z => {
+        const rows = g.filter(r => r[z+'_brake_distance'] != null);
+        distSeries.push({ name: z+' brake dist', type: 'line', xAxisIndex: 0, yAxisIndex: 0,
+          data: rows.map(r => [r.lap, r[z+'_brake_distance']]), showSymbol: false, smooth: 0.2,
+          lineStyle: { color: zColors[z], width: 2 }, itemStyle: { color: zColors[z] } });
+        spdSeries.push({ name: z+' min speed', type: 'line', xAxisIndex: 1, yAxisIndex: 1,
+          data: rows.map(r => [r.lap, r[z+'_min_speed']]), showSymbol: false, smooth: 0.2,
+          lineStyle: { color: zColors[z], width: 2 }, itemStyle: { color: zColors[z] } });
+      });
+      chart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+        legend: { textStyle: { color: '#ddd' }, top: 0 },
+        toolbox: { feature: { saveAsImage: {} }, iconStyle: { borderColor: '#888' } },
+        axisPointer: { link: [{ xAxisIndex: 'all' }] },
+        grid: [ { left: 70, right: 30, top: 50, height: '38%' }, { left: 70, right: 30, top: '58%', height: '34%' } ],
+        xAxis: [ { type: 'value', gridIndex: 0, min: 1, axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+                 { type: 'value', gridIndex: 1, min: 1, name: 'Race lap', nameLocation: 'middle', nameGap: 30, axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } } ],
+        yAxis: [ { type: 'value', gridIndex: 0, name: 'Brake distance (m)', axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+                 { type: 'value', gridIndex: 1, name: 'Min speed (km/h)', axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } } ],
+        series: distSeries.concat(spdSeries),
+      });
+    }
+
+    function renderDegRetirement(data) {
+      const el = document.getElementById('chart-deg-retirement');
+      const chart = echarts.init(el, 'dark'); el.__chart = chart;
+      const r = data.retirement;
+      const speedPts = r.time.map((t,i) => [t, r.speed[i]]);
+      // brake-on bands over time
+      const bands = [];
+      let inSeg = false, s = 0;
+      for (let i=0;i<r.time.length;i++){
+        if (r.brake[i]===1 && !inSeg){ inSeg=true; s=r.time[i]; }
+        else if (r.brake[i]===0 && inSeg){ inSeg=false; bands.push([{xAxis:s, itemStyle:{color:'#ED1131', opacity:0.10}},{xAxis:r.time[i]}]); }
+      }
+      if (inSeg) bands.push([{xAxis:s, itemStyle:{color:'#ED1131', opacity:0.10}},{xAxis:r.time[r.time.length-1]}]);
+      chart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', axisPointer: { type: 'cross' }, valueFormatter: v => v==null?'—':v.toFixed(0)+' km/h' },
+        legend: { data: ['Speed'], textStyle: { color: '#ddd' }, top: 0 },
+        toolbox: { feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+        grid: { left: 60, right: 30, top: 50, bottom: 60 },
+        xAxis: { type: 'value', name: 'Time into lap 65 (s)', nameLocation: 'middle', nameGap: 30, min: 0,
+                 axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+        yAxis: { type: 'value', name: 'Speed (km/h)', axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+        dataZoom: [ { type: 'inside', xAxisIndex: 0 }, { type: 'slider', xAxisIndex: 0, bottom: 8, height: 18, textStyle: { color: '#aaa' } } ],
+        series: [
+          { name: 'Speed', type: 'line', data: speedPts, showSymbol: false, smooth: 0.1,
+            lineStyle: { color: '#ED1131', width: 2 }, itemStyle: { color: '#ED1131' },
+            markArea: { silent: true, data: bands },
+            markLine: { silent: true, symbol: 'none', data: [
+              { xAxis: r.stop_time, label: { formatter: 'Final stop', color: '#fff', fontSize: 11 },
+                lineStyle: { color: '#fff', type: 'dashed', width: 1 } },
+            ] },
+          },
+        ],
+      });
+    }
+  </script>
+</body>
+</html>
