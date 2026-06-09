@@ -150,8 +150,399 @@
         <div id="chart-deg-percorner" class="chart-tall"></div>
       </div>
 
+      <div class="analysis-section" id="analysis-pit-speed-penalties">
+        <div class="section-title">The Pit-Lane Speeding Storm — Five Drivers, Six 5-Second Penalties</div>
+        <div class="section-timestamp">Generated: 2026-06-09</div>
+        <div class="section-desc">
+          Monaco runs the strictest pit-lane speed limit on the calendar — <b>60 km/h</b>, versus the usual 80 km/h
+          elsewhere — policed by FIA transponder loops to a fraction of a km/h. In this race the loops caught
+          <b>Hamilton, Russell, Colapinto, Piastri and Gasly</b> over the limit. Gasly was caught
+          <b>twice</b> (once in green-flag running, once under the Safety Car), so five drivers collected
+          <b>six</b> separate 5-second penalties. The reason it became so controversial is in the data below:
+          the offences clustered almost entirely in the chaotic pit rush triggered by the late Safety Cars and
+          the red flag, and the punishment was wildly uneven — Hamilton, Gasly and Piastri still made the podium
+          places, while Russell's slip cascaded into a full drive-through and a points-less afternoon.
+        </div>
+
+        <div class="summary-grid" id="penalty-cards"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">1 · Penalty timeline — when each driver was caught</h3>
+        <div class="section-desc">
+          Each row is one speeding offence. The hollow marker is when the incident was <i>noted / put under
+          investigation</i>; the solid diamond is when the <i>5-second penalty</i> was confirmed. Shaded bands mark
+          the two Safety Car periods and the red flag (laps 60–68). Note how Gasly's second offence and the bulk of
+          the late drama land squarely inside the Safety Car window, and how Russell's case escalates into a
+          drive-through for serving his penalty incorrectly.
+        </div>
+        <div id="chart-penalty-timeline" class="chart"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">2 · Why it happened — pit-lane congestion vs penalties</h3>
+        <div class="section-desc">
+          Bars show how many cars used the pit lane on each lap of the race. Pit traffic is a trickle for the first
+          58 laps, then <b>explodes</b> once the Safety Cars and red flag arrive: 10 stops on lap 59, then 9, 9 and a
+          remarkable <b>16</b> on lap 68 as the whole field funnels through the 60 km/h lane at once. The red markers
+          show when each speeding penalty was issued — they pile up exactly where the pit lane is most congested.
+          A narrow, downhill-then-uphill pit lane, a 60 km/h ceiling, and the entire grid arriving together is the
+          recipe that caught five drivers.
+        </div>
+        <div id="chart-pit-congestion" class="chart"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">3 · The uneven cost — same crime, very different sentence</h3>
+        <div class="section-desc">
+          Every driver here committed the same offence and took the same base 5-second hit, yet the outcomes could
+          not be more different. Because the Safety Cars bunched the field, Hamilton, Gasly and Piastri served their
+          penalties and still finished P2, P3 and P5. Russell, by contrast, served his incorrectly, was handed a
+          drive-through on top, and fell to P14; Colapinto's pair of issues left him P15. That disproportion — a
+          time-loss penalty being nearly free for the leaders but race-ruining for the midfield — is the heart of
+          the controversy.
+        </div>
+        <div id="chart-penalty-impact" class="chart"></div>
+      </div>
+
+      <div class="analysis-section" id="analysis-did-they-speed">
+        <div class="section-title">Did They Actually Speed — and By How Much?</div>
+        <div class="section-timestamp">Generated: 2026-06-09</div>
+        <div class="section-desc">
+          The drivers' defence — and Alpine's basis for requesting an FIA <b>Right of Review</b> over Gasly's
+          penalty — was that they never truly breached 60 km/h, and that Monaco's <b>curved pit exit</b> and the
+          placement of the timing-loop / exit line made the measurement unfair. We can test that against the
+          on-car telemetry. The pit-lane "controlled zone" shows up as the <b>limiter plateau</b>: a long, flat
+          run where the throttle climbs but the speed stays pinned (Monaco's slow corners are too brief to
+          confuse it). We read the <b>held</b> limiter speed and the in-zone <b>peak</b> for every pit passage of
+          the five drivers. <span style="color:#ffc100;">Caveat:</span> this is GPS-derived speed rounded to whole
+          km/h (≈ ±1), <i>not</i> the FIA's transponder-loop data — which is precisely why a 1 km/h argument is
+          even possible.
+        </div>
+
+        <div id="speed-verdict" style="background:#20203a;border-left:4px solid #ffc100;border-radius:6px;padding:16px 20px;margin-bottom:24px;line-height:1.55;">
+          <b style="color:#ffc100;">The short answer.</b> On the green-flag stops they were actually penalised for,
+          <b>all five drivers held 59–60 km/h</b> — sitting right on the limit, with only isolated single-sample
+          blips of 61–63 km/h that are inside GPS rounding noise. By this data they did <b>not</b> meaningfully
+          exceed 60 on those stops. The only <b>sustained</b> breaches in the entire race (held 63–66 km/h, ~3–6
+          over) came on <b>Safety-Car / red-flag pit <i>exits</i></b> — exactly the curved, accelerating section the
+          drivers complained about, where releasing the limiter a fraction early puts the car over the line right
+          where the loop measures.
+        </div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:8px;margin-bottom:6px;">1 · The penalised stop — held speed vs the 60 km/h line</h3>
+        <div class="section-desc">
+          Each driver's <i>penalised green-flag pit stop</i>. The bar is the held (steady-state limiter) speed; the
+          diamond is the highest single sample in the zone. The dashed line is the 60 km/h limit. Every bar lands at
+          or below the line — the held speed never sits above 60. Only Gasly's and Russell's instantaneous peaks
+          nick 62–63, and only for a single GPS sample.
+        </div>
+        <div id="chart-penalised-held" class="chart"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">2 · Every pit passage — where the real breaches actually were</h3>
+        <div class="section-desc">
+          Held limiter speed for <b>all 48</b> pit passages by the five drivers across the race. Circles = pit
+          entries, triangles = pit exits. The shaded band is the Safety-Car / red-flag window (laps 59–68). Note the
+          shape of it: green-flag stops cluster on the 60 line, and every point that pokes <b>clearly above</b> 60 is
+          a <b>pit exit inside the SC/red-flag window</b> — not a single green-flag entry breaches.
+        </div>
+        <div id="chart-allpassages" class="chart"></div>
+
+        <h3 style="color:#fff;font-size:15px;margin-top:32px;margin-bottom:6px;">3 · By how much — the limiter traces side by side</h3>
+        <div class="section-desc">
+          The actual speed trace through the limiter zone, normalised to the length of each passage. Solid lines are
+          the five <b>penalised green-flag stops</b> — flat against the 60 line, the signature of a correctly-set
+          limiter. Dashed lines are the four <b>Safety-Car / red-flag exit breaches</b> — visibly riding 3–6 km/h
+          higher. The gap between the solid cluster and the dashed cluster <i>is</i> the answer to "by how much".
+        </div>
+        <div id="chart-limiter-traces" class="chart"></div>
+
+        <div id="gasly-ror" style="background:#10243a;border-left:4px solid #00A1E8;border-radius:6px;padding:16px 20px;margin-top:28px;line-height:1.55;">
+          <b style="color:#00A1E8;">Gasly &amp; the Right of Review.</b> Gasly's <i>green-flag</i> stop (lap 45 in /
+          46 out) shows the limiter pinned at <b>60 km/h</b> both ways, with a lone 63 km/h sample on entry — i.e.
+          essentially at the limit. His one genuinely sustained breach is the <b>Safety-Car pit exit on lap 61</b>,
+          where he held <b>64 km/h</b> (peak 68) accelerating off the limiter on the curve. That is the crux of
+          Alpine's case: one of his penalties rests on a passage the on-car data puts at the limit, and the other on
+          a marginal exit overshoot in chaotic red-flag conditions — both decided by transponder margins finer than
+          this telemetry can resolve. Losing P3 to a call that fine is why it became a Right-of-Review fight.
+        </div>
+      </div>
+
     </div>
   </div>
+
+  <script>
+    (function() {
+      var INC = [
+        { id: 'HAM',   label: 'Hamilton (44)',  team: 'Ferrari',  color: '#ED1131', noted: 33, penalty: 34, served: 64, kind: '5s pit speeding', finish: 'P2' },
+        { id: 'RUS',   label: 'Russell (63)',   team: 'Mercedes', color: '#00D7B6', noted: 37, penalty: 38, served: null, kind: '5s pit speeding', finish: 'P14' },
+        { id: 'COL',   label: 'Colapinto (43)', team: 'Alpine',   color: '#00A1E8', noted: 41, penalty: 43, served: null, kind: '5s pit speeding', finish: 'P15' },
+        { id: 'GAS1',  label: 'Gasly (10) #1',  team: 'Alpine',   color: '#00A1E8', noted: 51, penalty: 52, served: null, kind: '5s pit speeding', finish: 'P3' },
+        { id: 'PIA',   label: 'Piastri (81)',   team: 'McLaren',  color: '#F47600', noted: 55, penalty: 55, served: 64, kind: '5s pit speeding', finish: 'P5' },
+        { id: 'GAS2',  label: 'Gasly (10) #2',  team: 'Alpine',   color: '#00A1E8', noted: 66, penalty: 68, served: null, kind: '5s pit speeding (under SC)', finish: 'P3' },
+        { id: 'RUSDT', label: 'Russell — drive-through', team: 'Mercedes', color: '#00D7B6', noted: 67, penalty: 68, served: 73, kind: 'Failed to serve penalty → drive-through', finish: 'P14' }
+      ];
+
+      // Safety Car / red-flag bands (lap ranges)
+      var BANDS = [
+        { name: 'Safety Car 1', from: 60, to: 65, color: 'rgba(255,200,0,0.10)' },
+        { name: 'SC2 + Red Flag', from: 66, to: 68, color: 'rgba(225,6,0,0.14)' }
+      ];
+
+      // Pit stops per lap across the whole field (from session_laptimes.json)
+      var PIT_COUNTS = {1:3,3:1,4:2,9:2,12:1,16:1,28:2,31:1,32:1,35:2,37:1,43:2,44:2,45:1,48:1,52:1,58:3,59:10,60:7,61:3,65:9,66:7,67:9,68:16,72:1};
+
+      /* ---- Summary cards ---- */
+      (function() {
+        var html = INC.filter(function(i){ return i.id !== 'RUSDT'; }).map(function(i) {
+          var extra = i.id === 'GAS2' ? ' <span style="color:#ffc100;">caught a 2nd time, under the Safety Car</span>'
+                    : (i.id === 'RUS' ? ' <span style="color:#ED1131;">later upgraded to a drive-through</span>' : '');
+          return '<div class="driver-card" style="border-left-color:' + i.color + '">' +
+                   '<div class="driver-name">' + i.label + '</div>' +
+                   '<div class="driver-meta">' + i.team + ' · ' + i.kind + '</div>' +
+                   '<div style="margin-top:10px;font-size:13px;color:#ddd;">' +
+                     'Noted lap ' + i.noted + ' → 5s penalty lap ' + i.penalty + '.' + extra +
+                     '<br><span style="color:#aaa;">Finished:</span> <b>' + i.finish + '</b>' +
+                   '</div>' +
+                 '</div>';
+        }).join('');
+        document.getElementById('penalty-cards').innerHTML = html;
+      })();
+
+      function bandMarkArea(yRef) {
+        return { silent: true, data: BANDS.map(function(b) {
+          return [ { xAxis: b.from, itemStyle: { color: b.color },
+                     label: { show: true, formatter: b.name, color: '#ccc', fontSize: 10, position: 'insideTop' } },
+                   { xAxis: b.to } ];
+        }) };
+      }
+
+      /* ---- Chart 1: penalty timeline ---- */
+      (function() {
+        var chart = echarts.init(document.getElementById('chart-penalty-timeline'), 'dark');
+        var cats = INC.map(function(i){ return i.label; });
+        var notedPts = INC.map(function(i, idx){ return { value: [i.noted, idx], itemStyle: { color: i.color } }; });
+        var penPts   = INC.map(function(i, idx){ return { value: [i.penalty, idx], itemStyle: { color: i.color } }; });
+        var links = INC.map(function(i, idx){
+          return { coords: [[i.noted, idx], [i.penalty, idx]], lineStyle: { color: i.color, width: 3, opacity: 0.6 } };
+        });
+        chart.setOption({
+          backgroundColor: 'transparent',
+          tooltip: { trigger: 'item', formatter: function(p){
+            var i = INC[p.value[1]];
+            return '<b>' + i.label + '</b><br>' + i.team + '<br>' + i.kind +
+                   '<br>Noted: lap ' + i.noted + '<br>Penalty: lap ' + i.penalty +
+                   (i.served ? '<br>Served: lap ' + i.served : ''); } },
+          legend: { data: ['Noted / under investigation', '5-second penalty'], textStyle: { color: '#ddd' }, top: 0 },
+          toolbox: { right: 20, feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+          grid: { left: 160, right: 40, top: 40, bottom: 50 },
+          xAxis: { type: 'value', name: 'Lap', nameLocation: 'middle', nameGap: 30, min: 30, max: 78,
+                   axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+          yAxis: { type: 'category', data: cats, inverse: true, axisLabel: { color: '#ddd', fontSize: 12 },
+                   splitLine: { show: true, lineStyle: { color: '#23233f' } } },
+          series: [
+            { name: 'Noted / under investigation', type: 'scatter', symbol: 'circle', symbolSize: 13,
+              data: notedPts, itemStyle: { color: 'transparent', borderWidth: 2 },
+              markArea: bandMarkArea(),
+              markLine: { silent: true, symbol: 'none', lineStyle: { color: '#888', type: 'dashed' },
+                          data: links.map(function(){ return null; }).filter(Boolean) } },
+            { name: '5-second penalty', type: 'scatter', symbol: 'diamond', symbolSize: 17, data: penPts },
+            { name: 'link', type: 'lines', coordinateSystem: 'cartesian2d', data: links, silent: true, z: 1,
+              lineStyle: { width: 3 }, tooltip: { show: false } }
+          ]
+        });
+        window.addEventListener('resize', function(){ chart.resize(); });
+      })();
+
+      /* ---- Chart 2: pit congestion vs penalties ---- */
+      (function() {
+        var chart = echarts.init(document.getElementById('chart-pit-congestion'), 'dark');
+        var laps = [], counts = [];
+        for (var l = 1; l <= 78; l++) { laps.push(l); counts.push(PIT_COUNTS[l] || 0); }
+        var penMarks = INC.filter(function(i){ return i.id !== 'RUSDT'; }).map(function(i){
+          return { name: i.id, xAxis: i.penalty, yAxis: (PIT_COUNTS[i.penalty] || 0),
+                   value: i.label.split(' ')[0],
+                   itemStyle: { color: i.color },
+                   label: { color: '#fff', fontSize: 10, formatter: i.label.split(' ')[0] } };
+        });
+        chart.setOption({
+          backgroundColor: 'transparent',
+          tooltip: { trigger: 'axis', formatter: function(p){
+            var l = p[0].axisValue; return 'Lap ' + l + '<br>Cars through pit lane: <b>' + p[0].data + '</b>'; } },
+          toolbox: { right: 20, feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+          grid: { left: 60, right: 30, top: 30, bottom: 60 },
+          xAxis: { type: 'category', data: laps, name: 'Lap', nameLocation: 'middle', nameGap: 32,
+                   axisLabel: { color: '#bbb', interval: 4 } },
+          yAxis: { type: 'value', name: 'Cars using pit lane', axisLabel: { color: '#bbb' },
+                   splitLine: { lineStyle: { color: '#2a2a48' } } },
+          dataZoom: [ { type: 'inside' }, { type: 'slider', bottom: 8, height: 16, textStyle: { color: '#aaa' } } ],
+          series: [
+            { name: 'Pit stops', type: 'bar', data: counts,
+              itemStyle: { color: function(p){ return (p.dataIndex + 1 >= 59 && p.dataIndex + 1 <= 68) ? '#e10600' : '#3a6ea5'; } },
+              markArea: { silent: true, data: [ [ { xAxis: '59', itemStyle: { color: 'rgba(225,6,0,0.08)' },
+                          label: { show: true, formatter: 'Safety Car / Red Flag pit rush', color: '#ffb3b3', fontSize: 11, position: 'insideTop' } },
+                          { xAxis: '68' } ] ] },
+              markPoint: { symbol: 'pin', symbolSize: 38, data: penMarks } }
+          ]
+        });
+        window.addEventListener('resize', function(){ chart.resize(); });
+      })();
+
+      /* ---- Chart 3: penalty impact (finishing position) ---- */
+      (function() {
+        var chart = echarts.init(document.getElementById('chart-penalty-impact'), 'dark');
+        var rows = [
+          { label: 'Hamilton (44)',  pos: 2,  color: '#ED1131', note: '5s pit speeding · served, kept P2' },
+          { label: 'Gasly (10)',     pos: 3,  color: '#00A1E8', note: 'TWO 5s pit-speeding penalties · still P3' },
+          { label: 'Piastri (81)',   pos: 5,  color: '#F47600', note: '5s pit speeding · served, P5' },
+          { label: 'Russell (63)',   pos: 14, color: '#00D7B6', note: '5s + drive-through (served penalty wrong) · P14' },
+          { label: 'Colapinto (43)', pos: 15, color: '#00A1E8', note: '5s pit speeding + track-limits woes · P15' }
+        ];
+        rows.sort(function(a,b){ return a.pos - b.pos; });
+        chart.setOption({
+          backgroundColor: 'transparent',
+          tooltip: { trigger: 'item', formatter: function(p){
+            var r = rows[p.dataIndex]; return '<b>' + r.label + '</b><br>Finished: P' + r.pos + '<br>' + r.note; } },
+          toolbox: { right: 20, feature: { saveAsImage: {} }, iconStyle: { borderColor: '#888' } },
+          grid: { left: 130, right: 50, top: 20, bottom: 50 },
+          xAxis: { type: 'value', name: 'Finishing position', nameLocation: 'middle', nameGap: 30, inverse: true,
+                   min: 1, max: 16, axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+          yAxis: { type: 'category', data: rows.map(function(r){ return r.label; }), inverse: true,
+                   axisLabel: { color: '#ddd', fontSize: 12 } },
+          series: [
+            { type: 'bar', data: rows.map(function(r){ return { value: r.pos, itemStyle: { color: r.color } }; }),
+              barWidth: '55%',
+              label: { show: true, position: 'right', formatter: function(p){ return 'P' + p.value; }, color: '#fff', fontWeight: 'bold' } }
+          ]
+        });
+        window.addEventListener('resize', function(){ chart.resize(); });
+      })();
+
+      document.getElementById('analysis-pit-speed-penalties').scrollIntoView({ behavior: 'smooth' });
+    })();
+  </script>
+
+  <script>
+    fetch('../analysis/monaco_pit_speed.json')
+      .then(function(r){ return r.json(); })
+      .then(function(data){ buildSpeedCharts(data); })
+      .catch(function(err){
+        document.getElementById('speed-verdict').innerHTML =
+          '<span style="color:#f66;">Failed to load monaco_pit_speed.json: ' + err.message +
+          '. Run <code>python analysis/monaco_pit_speed.py</code> and open via the http server.</span>';
+      });
+
+    function buildSpeedCharts(data) {
+      var LIMIT = data.limit;
+      var P = data.passages;
+      var COLORS = { HAM: '#ED1131', RUS: '#00D7B6', COL: '#00A1E8', GAS: '#00A1E8', PIA: '#F47600' };
+      var NAME = { HAM: 'Hamilton', RUS: 'Russell', COL: 'Colapinto', GAS: 'Gasly', PIA: 'Piastri' };
+      function get(d, l, t) {
+        for (var i = 0; i < P.length; i++) if (P[i].drv === d && P[i].lap === l && P[i].type === t) return P[i];
+        return null;
+      }
+
+      /* Chart 1: penalised green-flag stop, held vs peak vs 60 */
+      (function() {
+        var penStops = [ ['HAM', 28], ['RUS', 31], ['COL', 35], ['PIA', 48], ['GAS', 45] ];
+        var cats = [], held = [], peak = [];
+        penStops.forEach(function(s) {
+          var p = get(s[0], s[1], 'IN'); if (!p) return;
+          cats.push(NAME[s[0]] + ' (L' + s[1] + ')');
+          held.push({ value: p.held, itemStyle: { color: COLORS[s[0]] } });
+          peak.push({ value: p.peak, itemStyle: { color: '#fff' } });
+        });
+        var chart = echarts.init(document.getElementById('chart-penalised-held'), 'dark');
+        chart.setOption({
+          backgroundColor: 'transparent',
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' },
+            formatter: function(ps){ return ps[0].axisValue + '<br>Held: <b>' + ps[0].data.value +
+              '</b> km/h<br>Peak sample: ' + (ps[1] ? ps[1].data.value : '-') + ' km/h'; } },
+          legend: { data: ['Held (steady limiter)', 'Peak single sample'], textStyle: { color: '#ddd' }, top: 0 },
+          toolbox: { right: 20, feature: { saveAsImage: {} }, iconStyle: { borderColor: '#888' } },
+          grid: { left: 130, right: 40, top: 40, bottom: 40 },
+          xAxis: { type: 'value', name: 'Pit-lane speed (km/h)', nameLocation: 'middle', nameGap: 30,
+                   min: 40, max: 70, axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+          yAxis: { type: 'category', data: cats, axisLabel: { color: '#ddd', fontSize: 12 } },
+          series: [
+            { name: 'Held (steady limiter)', type: 'bar', data: held, barWidth: '45%',
+              label: { show: true, position: 'right', formatter: '{c}', color: '#fff' },
+              markLine: { silent: true, symbol: 'none', data: [ { xAxis: LIMIT } ],
+                lineStyle: { color: '#ffc100', type: 'dashed', width: 2 },
+                label: { formatter: '60 km/h limit', color: '#ffc100', position: 'end' } } },
+            { name: 'Peak single sample', type: 'scatter', data: peak.map(function(v, i){ return [v.value, i]; }),
+              symbol: 'diamond', symbolSize: 14, itemStyle: { color: '#fff' } }
+          ]
+        });
+        window.addEventListener('resize', function(){ chart.resize(); });
+      })();
+
+      /* Chart 2: every passage, held vs lap */
+      (function() {
+        var entries = P.filter(function(p){ return p.type === 'IN'; });
+        var exits = P.filter(function(p){ return p.type === 'OUT'; });
+        function pts(arr) { return arr.map(function(p){
+          return { value: [p.lap, p.held], itemStyle: { color: COLORS[p.drv] },
+                   meta: p }; }); }
+        var chart = echarts.init(document.getElementById('chart-allpassages'), 'dark');
+        chart.setOption({
+          backgroundColor: 'transparent',
+          tooltip: { trigger: 'item', formatter: function(o){ var p = o.data.meta;
+            return '<b>' + NAME[p.drv] + '</b> — lap ' + p.lap + ' (' + p.type + ', ' + p.phase + ')<br>' +
+              'Held: <b>' + p.held + '</b> km/h · peak ' + p.peak + '<br>' + p.verdict; } },
+          legend: { data: ['Pit entry', 'Pit exit'], textStyle: { color: '#ddd' }, top: 0 },
+          toolbox: { right: 20, feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+          grid: { left: 60, right: 30, top: 40, bottom: 55 },
+          xAxis: { type: 'value', name: 'Lap', nameLocation: 'middle', nameGap: 32, min: 25, max: 78,
+                   axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#23233f' } } },
+          yAxis: { type: 'value', name: 'Held pit-lane speed (km/h)', min: 35, max: 70,
+                   axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+          series: [
+            { name: 'Pit entry', type: 'scatter', symbol: 'circle', symbolSize: 12, data: pts(entries),
+              markArea: { silent: true, data: [ [ { xAxis: 59, itemStyle: { color: 'rgba(225,6,0,0.10)' },
+                          label: { show: true, formatter: 'Safety Car / Red Flag', color: '#ffb3b3', fontSize: 11, position: 'insideTop' } },
+                          { xAxis: 68 } ] ] },
+              markLine: { silent: true, symbol: 'none', data: [ { yAxis: LIMIT } ],
+                lineStyle: { color: '#ffc100', type: 'dashed', width: 2 },
+                label: { formatter: '60 km/h limit', color: '#ffc100' } } },
+            { name: 'Pit exit', type: 'scatter', symbol: 'triangle', symbolSize: 13, data: pts(exits) }
+          ]
+        });
+        window.addEventListener('resize', function(){ chart.resize(); });
+      })();
+
+      /* Chart 3: limiter traces, green penalised stops (solid) vs SC breaches (dashed) */
+      (function() {
+        function norm(trace) {
+          var n = trace.length;
+          return trace.map(function(v, i){ return [ n > 1 ? (i / (n - 1) * 100) : 0, v ]; });
+        }
+        var greens = [ ['HAM', 28, 'IN'], ['RUS', 31, 'IN'], ['COL', 35, 'IN'], ['PIA', 48, 'IN'], ['GAS', 45, 'IN'] ];
+        var breaches = [ ['GAS', 61, 'OUT'], ['HAM', 67, 'OUT'], ['RUS', 69, 'OUT'], ['COL', 67, 'IN'] ];
+        var series = [];
+        greens.forEach(function(g){ var p = get(g[0], g[1], g[2]); if (!p) return;
+          series.push({ name: NAME[g[0]] + ' L' + g[1] + ' (penalised, green)', type: 'line', smooth: 0.1,
+            showSymbol: false, data: norm(p.trace),
+            lineStyle: { color: COLORS[g[0]], width: 2.5 } }); });
+        breaches.forEach(function(b){ var p = get(b[0], b[1], b[2]); if (!p) return;
+          series.push({ name: NAME[b[0]] + ' L' + b[1] + ' (SC/red exit, held ' + p.held + ')', type: 'line', smooth: 0.1,
+            showSymbol: false, data: norm(p.trace),
+            lineStyle: { color: COLORS[b[0]], width: 2.5, type: 'dashed', opacity: 0.95 } }); });
+        var chart = echarts.init(document.getElementById('chart-limiter-traces'), 'dark');
+        chart.setOption({
+          backgroundColor: 'transparent',
+          tooltip: { trigger: 'axis', valueFormatter: function(v){ return (v == null ? '-' : v.toFixed(0) + ' km/h'); } },
+          legend: { type: 'scroll', textStyle: { color: '#ddd', fontSize: 11 }, top: 0 },
+          toolbox: { right: 20, feature: { saveAsImage: {}, dataZoom: {} }, iconStyle: { borderColor: '#888' } },
+          grid: { left: 60, right: 30, top: 60, bottom: 50 },
+          xAxis: { type: 'value', name: 'Through the limiter zone (%)', nameLocation: 'middle', nameGap: 30,
+                   min: 0, max: 100, axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#23233f' } } },
+          yAxis: { type: 'value', name: 'Speed (km/h)', min: 45, max: 75,
+                   axisLabel: { color: '#bbb' }, splitLine: { lineStyle: { color: '#2a2a48' } } },
+          series: series.concat([{ name: '60 limit', type: 'line', data: [], markLine: { silent: true, symbol: 'none',
+            data: [ { yAxis: LIMIT } ], lineStyle: { color: '#ffc100', type: 'dashed', width: 2 },
+            label: { formatter: '60 km/h', color: '#ffc100' } } }])
+        });
+        window.addEventListener('resize', function(){ chart.resize(); });
+      })();
+
+      document.getElementById('analysis-did-they-speed').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
 
   <script>
     fetch('../analysis/monaco_ferrari_brakes.json')

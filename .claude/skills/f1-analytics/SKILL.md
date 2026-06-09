@@ -4,8 +4,8 @@ description: >
   F1 2026 data analysis skill for this project. Use whenever the user asks to
   analyse races, compare drivers, look at lap times, telemetry, tyre strategy,
   sector performance, weather effects, race control events, or any other Formula 1
-  data question. Also trigger when the user mentions a specific grand prix (Australian,
-  Chinese), a driver name or code (HAM, VER, NOR, etc.), session type (FP1, qualifying,
+  data question. Also trigger when the user mentions a specific grand prix (Eg. Australian,
+  Chinese etc.), a driver name or code (HAM, VER, NOR, etc.), session type (FP1, qualifying,
   race, sprint), or any F1 concept (DRS, fastest lap, pit stop, stint, compound).
   This skill covers the full workflow: loading JSON data → Python analysis → ECharts
   dashboard → browser display.
