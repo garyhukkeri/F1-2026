@@ -2,8 +2,8 @@ name: SR
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '0 16 13 2 *'
+  schedule:
+    - cron: '0 17 23 5 *'
 
 
 env:

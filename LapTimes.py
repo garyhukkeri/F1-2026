@@ -34,14 +34,14 @@ import requests
 DEFAULT_YEAR = 2026
 # Keep exactly one uncommented event in this list.
 TARGET_EVENT_NAMES_LIST = [
-    "Australian Grand Prix",
+    # "Australian Grand Prix",
     # "Chinese Grand Prix",
     # "Japanese Grand Prix",
     # "Bahrain Grand Prix",
     # "Saudi Arabian Grand Prix",
     # "Miami Grand Prix",
     # "Emilia Romagna Grand Prix",
-    # "Monaco Grand Prix",
+    "Monaco Grand Prix",
     # "Spanish Grand Prix",
     # "Canadian Grand Prix",
     # "Austrian Grand Prix",
@@ -59,11 +59,9 @@ TARGET_EVENT_NAMES_LIST = [
     # "Qatar Grand Prix",
     # "Abu Dhabi Grand Prix",
 ]
-if len(TARGET_EVENT_NAMES_LIST) != 1:
-    raise ValueError(
-        "Set exactly one active event in TARGET_EVENT_NAME (comment all others)."
-    )
-TARGET_EVENT_NAME = TARGET_EVENT_NAMES_LIST[0]
+TARGET_EVENT_NAMES = [e.strip() for e in TARGET_EVENT_NAMES_LIST if e.strip()]
+if not TARGET_EVENT_NAMES:
+    raise ValueError("Set at least one active event in TARGET_EVENT_NAMES_LIST.")
 AVAILABLE_SESSIONS = [
     "Practice 1",
     "Practice 2",
@@ -75,10 +73,10 @@ AVAILABLE_SESSIONS = [
 ]
 # Select one or more sessions from AVAILABLE_SESSIONS.
 TARGET_SESSIONS = [
-    # "Practice 1",
-    # "Practice 2",
-    # "Practice 3",
-    # "Qualifying",
+    "Practice 1",
+    "Practice 2",
+    "Practice 3",
+    "Qualifying",
     # "Sprint Qualifying",
     # "Sprint",
     "Race",
@@ -738,7 +736,7 @@ class SeasonSessionExtractor:
         driver: str,
     ) -> Dict[int, Any]:
         """
-        Returns {lap_number: LapTime_timedelta} for a driver from Ergast.
+        Returns {lap_number: {"LapTime": timedelta, "position": int}} for a driver from Ergast.
         Result is empty dict if not a Race session or data unavailable.
         """
         cache_key = f"{self.year}-{event_name}-Race"
@@ -770,7 +768,10 @@ class SeasonSessionExtractor:
 
         driver_rows = all_laps_df[all_laps_df["driverId"] == driver_id]
         return {
-            int(row["LapNumber"]): row["LapTime_Ergast"]
+            int(row["LapNumber"]): {
+                "LapTime": row["LapTime_Ergast"],
+                "position": row.get("position"),
+            }
             for _, row in driver_rows.iterrows()
         }
 
@@ -925,11 +926,56 @@ class SeasonSessionExtractor:
                 )
                 if ergast_map:
                     driver_laps = driver_laps.copy()
+                    ergast_lt_map = {k: v["LapTime"] for k, v in ergast_map.items()}
+                    ergast_pos_map = {
+                        k: v["position"]
+                        for k, v in ergast_map.items()
+                        if v.get("position") is not None
+                    }
                     driver_laps["LapTime"] = (
                         driver_laps["LapNumber"]
-                        .map(ergast_map)
+                        .map(ergast_lt_map)
                         .fillna(driver_laps["LapTime"])
                     )
+                    if ergast_pos_map:
+                        driver_laps["Position"] = (
+                            driver_laps["LapNumber"]
+                            .map(ergast_pos_map)
+                            .fillna(driver_laps["Position"])
+                        )
+
+                    # Insert rows for laps Ergast has but FastF1 dropped
+                    # (e.g. lap 1, laps above 2:30).
+                    existing_laps = set(driver_laps["LapNumber"].dropna().astype(int))
+                    missing_laps = sorted(set(ergast_map) - existing_laps)
+                    if missing_laps:
+                        drv_abbr = driver
+                        drv_num = None
+                        try:
+                            drv_info = f1session.get_driver(driver)
+                            drv_abbr = drv_info.get("Abbreviation", driver)
+                            drv_num = str(drv_info.get("DriverNumber", ""))
+                        except Exception:
+                            pass
+                        stub_rows = []
+                        for lap_num in missing_laps:
+                            ergast_entry = ergast_map[lap_num]
+                            stub = {col: np.nan for col in driver_laps.columns}
+                            stub["LapNumber"] = lap_num
+                            stub["LapTime"] = ergast_entry["LapTime"]
+                            pos = ergast_entry.get("position")
+                            if pos is not None:
+                                stub["Position"] = pos
+                            stub["Driver"] = drv_abbr
+                            if drv_num is not None:
+                                stub["DriverNumber"] = drv_num
+                            stub_rows.append(stub)
+                        stub_df = pd.DataFrame(stub_rows, columns=driver_laps.columns)
+                        driver_laps = (
+                            pd.concat([driver_laps, stub_df], ignore_index=True)
+                            .sort_values("LapNumber")
+                            .reset_index(drop=True)
+                        )
 
             lap_weather = _lap_weather_to_column_lists(driver_laps, session_weather_df)
             mini_sector_columns = _mini_sector_columns_from_laps(
@@ -1089,9 +1135,8 @@ class SeasonSessionExtractor:
         logger.info("Starting laptimes extraction for %d", self.year)
         start_time = time.time()
 
-        event_name = TARGET_EVENT_NAME.strip() if TARGET_EVENT_NAME else ""
-        if not event_name:
-            logger.warning("No TARGET_EVENT_NAME configured — nothing to extract.")
+        if not TARGET_EVENT_NAMES:
+            logger.warning("No TARGET_EVENT_NAMES configured — nothing to extract.")
             return
 
         sessions = [s for s in TARGET_SESSIONS if isinstance(s, str) and s.strip()]
@@ -1099,13 +1144,14 @@ class SeasonSessionExtractor:
             logger.warning("No TARGET_SESSIONS configured — nothing to extract.")
             return
 
-        logger.info("Processing %s (%s)", event_name, ", ".join(sessions))
-        for session_name in sessions:
-            try:
-                self.process_event_session(event_name, session_name)
-            except Exception as e:
-                logger.error("Failed %s %s: %s", event_name, session_name, e)
-            check_memory_usage(session_cache=self._session_cache)
+        for event_name in TARGET_EVENT_NAMES:
+            logger.info("Processing %s (%s)", event_name, ", ".join(sessions))
+            for session_name in sessions:
+                try:
+                    self.process_event_session(event_name, session_name)
+                except Exception as e:
+                    logger.error("Failed %s %s: %s", event_name, session_name, e)
+                check_memory_usage(session_cache=self._session_cache)
 
         elapsed = time.time() - start_time
         logger.info("Laptimes extraction completed in %.2f seconds", elapsed)
@@ -1124,7 +1170,7 @@ def is_session_data_available(
     """Check if data is available for the first specified event/session pair."""
     try:
         if events is None:
-            events = [TARGET_EVENT_NAME] if TARGET_EVENT_NAME else []
+            events = list(TARGET_EVENT_NAMES)
         if sessions is None:
             sessions = list(TARGET_SESSIONS)
 
