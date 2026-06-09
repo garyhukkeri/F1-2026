@@ -13,6 +13,7 @@ Run this after adding/updating a dashboard, then commit ``docs/``:
 """
 
 import html
+import os
 import re
 import shutil
 from datetime import datetime, timezone
@@ -24,6 +25,9 @@ OUT = ROOT / "docs"
 
 TITLE_RE = re.compile(r"<title>(.*?)</title>", re.IGNORECASE | re.DOTALL)
 TITLE_PREFIX = re.compile(r"^\s*F1\s*2026\s*[—\-–:]\s*", re.IGNORECASE)
+# Relative data files a dashboard loads at runtime (e.g. fetch('../analysis/x.json')).
+ASSET_RE = re.compile(r"""['"]([^'":?]+\.(?:json|csv|geojson))(?:\?[^'"]*)?['"]""",
+                      re.IGNORECASE)
 
 
 def read_title(path: Path) -> str:
@@ -64,14 +68,18 @@ def build():
     (OUT / ".nojekyll").write_text("", encoding="utf-8")
 
     cards = []
+    copied_assets = 0
     for path in dashboards:
+        text = path.read_text(encoding="utf-8", errors="ignore")
         shutil.copy2(path, OUT / "visualizations" / path.name)
+        copied_assets += copy_assets(text)
+        title = read_title(path)
         cards.append(
             {
-                "title": read_title(path),
+                "title": title,
                 "href": f"visualizations/{path.name}",
                 "file": path.name,
-                "event": event_key(read_title(path)),
+                "event": event_key(title),
             }
         )
 
@@ -82,7 +90,36 @@ def build():
     generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     (OUT / "index.html").write_text(render_index(groups, generated, len(cards)),
                                     encoding="utf-8")
-    print(f"Built {OUT/'index.html'} with {len(cards)} dashboard(s).")
+    print(f"Built {OUT/'index.html'} with {len(cards)} dashboard(s); "
+          f"copied {copied_assets} data file(s).")
+
+
+def copy_assets(html_text: str) -> int:
+    """Copy relative data files a dashboard fetches into docs/, preserving paths.
+
+    Dashboards live in ``visualizations/`` and fetch data via paths relative to
+    that folder (e.g. ``../analysis/x.json``). The copied dashboard lives in
+    ``docs/visualizations/``, so mirroring the same relative path under
+    ``docs/`` keeps those fetches working on GitHub Pages.
+    """
+    copied = 0
+    seen: set[str] = set()
+    for ref in ASSET_RE.findall(html_text):
+        if ref in seen or ref.startswith(("http://", "https://", "//", "data:")):
+            continue
+        seen.add(ref)
+        src_file = (SRC / ref).resolve()
+        # Stay within the repo; ignore anything that escapes it.
+        if ROOT not in src_file.parents and src_file != ROOT:
+            continue
+        if not src_file.is_file():
+            print(f"  warning: referenced data file not found: {ref}")
+            continue
+        dest = Path(os.path.normpath(OUT / "visualizations" / ref))
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src_file, dest)
+        copied += 1
+    return copied
 
 
 def render_index(groups: dict[str, list[dict]], generated: str, count: int) -> str:

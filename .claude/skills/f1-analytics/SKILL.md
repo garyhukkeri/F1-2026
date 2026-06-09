@@ -277,6 +277,12 @@ Never hand-edit `docs/index.html` or files under `docs/` — they are generated.
 Edit `visualizations/` and rerun the build instead. Add new dashboards only to
 `visualizations/`; the index updates itself on the next build.
 
+**Runtime data files:** if a dashboard loads JSON/CSV at runtime, reference it
+with a path relative to `visualizations/` (e.g. `fetch('../analysis/x.json')`).
+The builder detects these references and copies the files into `docs/` at the
+same relative location, so the fetches keep working on GitHub Pages. Generate
+the data file (run its `.py`) before building.
+
 ---
 
 ## ECharts Policy (Strict)
