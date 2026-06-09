@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>F1 2026 — Australian Grand Prix Practice 1</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <style>
+    body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; }
+    h1 { color: #e10600; font-size: 28px; margin-bottom: 4px; }
+    .subtitle { color: #aaa; font-size: 13px; margin-bottom: 40px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .analysis-section { margin-bottom: 60px; padding-bottom: 40px; border-bottom: 1px solid #333; }
+    .analysis-section:last-child { border-bottom: none; }
+    .section-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .section-timestamp { color: #666; font-size: 11px; margin-bottom: 20px; }
+    .chart { width: 100%; height: 500px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>F1 2026 — Australian Grand Prix Practice 1</h1>
+    <div class="subtitle">Interactive analysis</div>
+    <div id="analytics-content">
+<div class="analysis-section" id="analysis-20260422-pia-track-time">
+  <div class="section-title">PIA — Time on Track by Stint</div>
+  <div class="section-timestamp">Generated: 2026-04-22</div>
+  <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+    <div id="chart-stint-bar" style="width: 60%; min-width: 500px; height: 500px;"></div>
+    <div id="chart-stint-pie" style="width: 35%; min-width: 350px; height: 500px;"></div>
+  </div>
+</div>
+<script>
+  (function() {
+    var stints = ['Stint 1\nLaps 1–3\nMEDIUM', 'Stint 2\nLaps 4–8\nMEDIUM', 'Stint 3\nLaps 9–13\nMEDIUM', 'Stint 4\nLaps 14–21\nSOFT'];
+    var durations = [418.702, 482.731, 488.477, 848.565];
+    var laps = [3, 5, 5, 8];
+    var compounds = ['MEDIUM', 'MEDIUM', 'MEDIUM', 'SOFT'];
+    var compoundColors = { MEDIUM: '#f5c542', SOFT: '#e10600' };
+    var totalOnTrack = 2238.475;
+    var totalSession = 4840.566 - 965.686 + 965.686;
+
+    function fmtTime(s) {
+      var m = Math.floor(s / 60);
+      var sec = Math.floor(s % 60);
+      return m + 'm ' + (sec < 10 ? '0' : '') + sec + 's';
+    }
+
+    var barChart = echarts.init(document.getElementById('chart-stint-bar'), 'dark');
+    barChart.setOption({
+      title: { text: 'Time on Track per Stint', left: 'center', top: 10, textStyle: { fontSize: 16, color: '#fff' } },
+      tooltip: {
+        trigger: 'axis',
+        formatter: function(params) {
+          var p = params[0];
+          var i = p.dataIndex;
+          return '<b>Stint ' + (i+1) + '</b> — ' + compounds[i] +
+            '<br/>Laps: ' + laps[i] +
+            '<br/>Duration: <b>' + fmtTime(durations[i]) + '</b>' +
+            '<br/>(' + durations[i].toFixed(1) + ' seconds)';
+        }
+      },
+      toolbox: { feature: { saveAsImage: { title: 'Save' } }, right: 20 },
+      xAxis: {
+        type: 'category',
+        data: ['Stint 1\n(MED)', 'Stint 2\n(MED)', 'Stint 3\n(MED)', 'Stint 4\n(SOFT)'],
+        axisLabel: { color: '#ccc', fontSize: 12 }
+      },
+      yAxis: {
+        type: 'value',
+        name: 'Seconds',
+        nameTextStyle: { color: '#aaa' },
+        axisLabel: {
+          color: '#aaa',
+          formatter: function(v) { return fmtTime(v); }
+        },
+        splitLine: { lineStyle: { color: '#333' } }
+      },
+      series: [{
+        type: 'bar',
+        data: durations.map(function(d, i) {
+          return { value: d, itemStyle: { color: compoundColors[compounds[i]] } };
+        }),
+        barWidth: '50%',
+        label: {
+          show: true,
+          position: 'top',
+          formatter: function(p) { return fmtTime(p.value) + '\n(' + laps[p.dataIndex] + ' laps)'; },
+          color: '#fff',
+          fontSize: 13,
+          fontWeight: 'bold',
+          lineHeight: 18
+        }
+      }],
+      grid: { left: 80, right: 30, bottom: 50, top: 70 }
+    });
+
+    var pieChart = echarts.init(document.getElementById('chart-stint-pie'), 'dark');
+    var pitTime = totalSession - totalOnTrack;
+    pieChart.setOption({
+      title: { text: 'Track vs Pit Time', left: 'center', top: 10, textStyle: { fontSize: 16, color: '#fff' } },
+      tooltip: {
+        formatter: function(p) {
+          return p.name + '<br/>' + fmtTime(p.value) + ' (' + p.percent.toFixed(1) + '%)';
+        }
+      },
+      toolbox: { feature: { saveAsImage: { title: 'Save' } }, right: 10 },
+      legend: { bottom: 10, textStyle: { color: '#ccc' } },
+      series: [{
+        type: 'pie',
+        radius: ['40%', '65%'],
+        center: ['50%', '52%'],
+        avoidLabelOverlap: true,
+        itemStyle: { borderRadius: 6, borderColor: '#1a1a2e', borderWidth: 2 },
+        label: {
+          formatter: '{b}\n{d}%',
+          color: '#eee',
+          fontSize: 13
+        },
+        data: [
+          { value: Math.round(totalOnTrack), name: 'On Track', itemStyle: { color: '#FF8700' } },
+          { value: Math.round(pitTime), name: 'In Pit Lane', itemStyle: { color: '#555' } }
+        ]
+      }]
+    });
+
+    window.addEventListener('resize', function() {
+      barChart.resize();
+      pieChart.resize();
+    });
+    document.getElementById('analysis-20260422-pia-track-time').scrollIntoView({ behavior: 'smooth' });
+  })();
+</script>
+    </div>
+  </div>
+</body>
+</html>
