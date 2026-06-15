@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>F1 2026 — Hamilton Title Permutations (after Barcelona)</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <style>
+    :root { --red: #e10600; --ferrari: #ED1131; --merc: #00D7B6; --bg: #1a1a2e; --card: #24243e; --muted: #8a8aa3; --border: #33334e; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: #eee; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    h1 { color: var(--red); font-size: 30px; margin: 0 0 6px; }
+    .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 32px; line-height: 1.5; }
+    h2 { font-size: 21px; color: #fff; margin: 40px 0 6px; }
+    .section-note { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 0 0 16px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+    .stat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+    .stat .value { font-size: 28px; font-weight: 700; color: #fff; line-height: 1.1; }
+    .stat .value.warn { color: #ffb454; }
+    .stat .value.good { color: var(--merc); }
+    .stat .label { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .callout { border-radius: 10px; padding: 16px 18px; margin: 18px 0; font-size: 14px; line-height: 1.6; border: 1px solid var(--border); }
+    .callout.good { background: rgba(0,215,182,0.08); border-color: rgba(0,215,182,0.35); }
+    .callout.info { background: rgba(71,129,215,0.08); border-color: rgba(71,129,215,0.35); }
+    .callout .title { font-weight: 700; color: #fff; display: block; margin-bottom: 6px; }
+    .callout strong { color: #fff; }
+    table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; font-size: 14px; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+    tr:last-child td { border-bottom: none; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .tag.win { background: rgba(0,215,182,0.16); color: var(--merc); }
+    .tag.lose { background: rgba(225,6,0,0.16); color: #ff6b66; }
+    .tag.tie { background: rgba(255,180,84,0.16); color: #ffb454; }
+    .row-ham td { color: #fff; }
+    .row-ham td:first-child { box-shadow: inset 3px 0 0 var(--ferrari); }
+    .row-ant td:first-child { box-shadow: inset 3px 0 0 var(--merc); }
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .preset { background: var(--card); border: 1px solid var(--border); color: #ddd; padding: 7px 12px; border-radius: 999px; font-size: 13px; cursor: pointer; transition: all .12s ease; }
+    .preset:hover { border-color: var(--red); background: #2c2c4a; color: #fff; }
+    .sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 680px) { .sim-grid { grid-template-columns: 1fr; } }
+    .driver-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+    .driver-card.ham { border-top: 3px solid var(--ferrari); }
+    .driver-card.ant { border-top: 3px solid var(--merc); }
+    .driver-card h3 { margin: 0 0 14px; font-size: 16px; color: #fff; }
+    .field { margin-bottom: 12px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+    select { width: 100%; background: #1f1f38; color: #eee; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 14px; }
+    .verdict-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 18px 0 6px; font-size: 16px; }
+    .verdict-bar .proj { font-weight: 700; color: #fff; }
+    .verdict-bar .vs { color: var(--muted); }
+    .verdict-bar .spacer { flex: 1; }
+    .verdict-tag { padding: 5px 12px; border-radius: 999px; font-size: 14px; font-weight: 700; }
+    .chart { width: 100%; height: 260px; }
+    .source { color: #555; font-size: 12px; margin-top: 8px; line-height: 1.5; }
+    .footer { color: #555; font-size: 12px; margin-top: 48px; border-top: 1px solid var(--border); padding-top: 16px; }
+    a { color: #6aa3ff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Can Hamilton Win the 2026 Title?</h1>
+    <div class="subtitle">
+      Permutation analysis after Round 7, the Barcelona-Catalunya Grand Prix. Hamilton sits P2 on
+      115 points, 41 behind championship leader Kimi Antonelli (156). 15 races remain — 3 of them
+      sprints (Great Britain, Netherlands, Singapore) on the 22-round calendar.
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="value">115</div><div class="label">Hamilton points (P2)</div></div>
+      <div class="stat"><div class="value warn">-41</div><div class="label">Gap to Antonelli</div></div>
+      <div class="stat"><div class="value">15</div><div class="label">Races left (3 sprints)</div></div>
+      <div class="stat"><div class="value">399</div><div class="label">Max points still available</div></div>
+      <div class="stat"><div class="value good">514</div><div class="label">Hamilton's ceiling</div></div>
+    </div>
+
+    <div class="callout good">
+      <span class="title">Mathematically: yes, comfortably alive</span>
+      With 399 points still on the table, Hamilton can reach 514 — far above Antonelli's current
+      156. The real question is the head-to-head swing: Hamilton must out-score Antonelli by a net
+      <strong>42 points</strong> across the remaining 15 weekends (about 2.8 per weekend) to move
+      ahead — roughly finishing one place ahead of him on half the Sundays.
+    </div>
+
+    <h2>Who Hamilton has to beat</h2>
+    <p class="section-note">
+      For the title Hamilton must finish ahead of everyone, but only Antonelli is currently in front
+      of him. Russell (just 9 behind) is the nearest threat from behind — a run strong enough to
+      catch Antonelli clears the rest automatically.
+    </p>
+    <table id="contenders">
+      <thead><tr>
+        <th>Driver</th><th>Team</th><th class="num">Points</th>
+        <th class="num">Gap to HAM</th><th class="num">Max attainable</th><th>Title math</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <h2>Permutation simulator</h2>
+    <p class="section-note">
+      Assume each driver averages these finishes across the 15 remaining weekends, then read off the
+      projected final standings. Sprint points apply only at the 3 sprint weekends.
+    </p>
+    <div class="presets" id="presets"></div>
+    <div class="sim-grid">
+      <div class="driver-card ham">
+        <h3>Lewis Hamilton — Ferrari</h3>
+        <div class="field"><label>Average race finish</label><select id="hr"></select></div>
+        <div class="field"><label>Average sprint finish</label><select id="hs"></select></div>
+      </div>
+      <div class="driver-card ant">
+        <h3>Kimi Antonelli — Mercedes</h3>
+        <div class="field"><label>Average race finish</label><select id="ar"></select></div>
+        <div class="field"><label>Average sprint finish</label><select id="as"></select></div>
+        <div class="field"><label>Race retirements (reliability)</label><select id="ad"></select></div>
+      </div>
+    </div>
+    <div class="verdict-bar">
+      <span>Projected final:</span>
+      <span class="proj" id="hamProj">Hamilton —</span>
+      <span class="vs">vs</span>
+      <span class="proj" id="antProj">Antonelli —</span>
+      <span class="spacer"></span>
+      <span class="verdict-tag" id="verdict"></span>
+    </div>
+    <div id="simChart" class="chart"></div>
+    <p class="source">
+      Source: 2026 standings after Barcelona (Round 7). 15 races + 3 sprints remain.
+      Points: race 25-18-15-12-10-8-6-4-2-1, sprint 8-7-6-5-4-3-2-1, no fastest-lap point.
+    </p>
+
+    <h2>Five representative permutations</h2>
+    <table id="scenarios">
+      <thead><tr>
+        <th>Scenario</th><th>Assumption</th>
+        <th class="num">HAM final</th><th class="num">ANT final</th><th>Outcome</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="callout info">
+      <span class="title">The verdict</span>
+      Hamilton's title is very much alive but demands sustained outperformance, not just bad luck for
+      Antonelli. Beating him by one position most weekends (the "realistic push") flips it by a slim
+      margin; matching him keeps the 41-point gap frozen and hands the crown to Mercedes. Antonelli's
+      reliability — flagged as a concern at Mercedes — is the swing factor that could turn a close
+      fight decisively Hamilton's way.
+    </div>
+
+    <div class="footer">F1 2026 · Championship permutation analysis · interactive — change the dropdowns to explore.</div>
+  </div>
+
+  <script>
+    const HAM_NOW = 115, ANT_NOW = 156, N_RACES = 15, N_SPRINTS = 3;
+    const RACE_PTS = [25,18,15,12,10,8,6,4,2,1];
+    const SPRINT_PTS = [8,7,6,5,4,3,2,1];
+    const FERRARI = '#ED1131', MERC = '#00D7B6';
+
+    const racePoints = p => (p >= 1 && p <= 10) ? RACE_PTS[p-1] : 0;
+    const sprintPoints = p => (p >= 1 && p <= 8) ? SPRINT_PTS[p-1] : 0;
+
+    function project(i) {
+      const ham = HAM_NOW + N_RACES*racePoints(i.hr) + N_SPRINTS*sprintPoints(i.hs);
+      const antRaces = Math.max(0, N_RACES - i.ad);
+      const ant = ANT_NOW + antRaces*racePoints(i.ar) + N_SPRINTS*sprintPoints(i.as);
+      return { ham, ant, margin: ham - ant };
+    }
+
+    // ---- Contenders table ----
+    const CONTENDERS = [
+      { name: 'Kimi Antonelli', team: 'Mercedes', pts: 156, key: 'ant' },
+      { name: 'Lewis Hamilton', team: 'Ferrari', pts: 115, key: 'ham' },
+      { name: 'George Russell', team: 'Mercedes', pts: 106 },
+      { name: 'Charles Leclerc', team: 'Ferrari', pts: 75 },
+      { name: 'Lando Norris', team: 'McLaren', pts: 73 },
+      { name: 'Oscar Piastri', team: 'McLaren', pts: 68 },
+      { name: 'Max Verstappen', team: 'Red Bull', pts: 55 },
+    ];
+    const MAX_REMAINING = N_RACES*25 + N_SPRINTS*8;
+    (function () {
+      const tb = document.querySelector('#contenders tbody');
+      CONTENDERS.forEach(c => {
+        const ceiling = c.pts + MAX_REMAINING;
+        const gap = c.pts - HAM_NOW;
+        const gapStr = gap === 0 ? '—' : (gap > 0 ? '+'+gap : ''+gap);
+        const alive = ceiling >= ANT_NOW;
+        const tr = document.createElement('tr');
+        if (c.key) tr.className = 'row-' + c.key;
+        tr.innerHTML =
+          `<td>${c.name}</td><td>${c.team}</td><td class="num">${c.pts}</td>` +
+          `<td class="num">${gapStr}</td><td class="num">${ceiling}</td>` +
+          `<td>${alive ? 'Alive' : 'Out'}</td>`;
+        tb.appendChild(tr);
+      });
+    })();
+
+    // ---- Scenarios table ----
+    const SCENARIOS = [
+      { name: 'Hamilton runs the table', desc: 'HAM wins every race + sprint, ANT a steady 2nd', hr:1, hs:1, ar:2, as:2, ad:0 },
+      { name: 'Realistic title push', desc: 'HAM averages P2 (and sprint P2), ANT averages P3', hr:2, hs:2, ar:3, as:3, ad:0 },
+      { name: 'Antonelli reliability dip', desc: 'HAM avg P2, ANT avg P4 with one retirement', hr:2, hs:2, ar:4, as:5, ad:1 },
+      { name: 'Status quo (level pegging)', desc: 'Both score identically every weekend (avg P2)', hr:2, hs:2, ar:2, as:2, ad:0 },
+      { name: 'Hamilton off the pace', desc: 'HAM avg P3 while ANT holds P2', hr:3, hs:3, ar:2, as:2, ad:0 },
+    ];
+    (function () {
+      const tb = document.querySelector('#scenarios tbody');
+      SCENARIOS.forEach(s => {
+        const { ham, ant, margin } = project(s);
+        let tag;
+        if (margin > 0) tag = `<span class="tag win">Hamilton +${margin}</span>`;
+        else if (margin === 0) tag = `<span class="tag tie">Level — countback</span>`;
+        else tag = `<span class="tag lose">Antonelli ${margin}</span>`;
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          `<td>${s.name}</td><td>${s.desc}</td>` +
+          `<td class="num">${ham}</td><td class="num">${ant}</td><td>${tag}</td>`;
+        tb.appendChild(tr);
+      });
+    })();
+
+    // ---- Simulator controls ----
+    const POS = [
+      [1,'P1 — win'],[2,'P2'],[3,'P3'],[4,'P4'],[5,'P5'],[6,'P6'],
+      [7,'P7'],[8,'P8'],[9,'P9'],[10,'P10'],[0,'Out of points / DNF']
+    ];
+    const SPR = [[1,'P1'],[2,'P2'],[3,'P3'],[4,'P4'],[5,'P5'],[6,'P6'],[7,'P7'],[8,'P8'],[0,'No points']];
+    const DNF = [[0,'0 — finishes all'],[1,'1 retirement'],[2,'2 retirements'],[3,'3 retirements']];
+
+    function fill(id, opts) {
+      const sel = document.getElementById(id);
+      opts.forEach(([v,l]) => {
+        const o = document.createElement('option');
+        o.value = v; o.textContent = l; sel.appendChild(o);
+      });
+    }
+    fill('hr', POS); fill('hs', SPR); fill('ar', POS); fill('as', SPR); fill('ad', DNF);
+
+    const DEFAULTS = { hr:1, hs:1, ar:2, as:2, ad:0 };
+    function setInputs(i) {
+      document.getElementById('hr').value = i.hr;
+      document.getElementById('hs').value = i.hs;
+      document.getElementById('ar').value = i.ar;
+      document.getElementById('as').value = i.as;
+      document.getElementById('ad').value = i.ad;
+      update();
+    }
+    function readInputs() {
+      return {
+        hr: +document.getElementById('hr').value,
+        hs: +document.getElementById('hs').value,
+        ar: +document.getElementById('ar').value,
+        as: +document.getElementById('as').value,
+        ad: +document.getElementById('ad').value,
+      };
+    }
+
+    // Presets
+    (function () {
+      const wrap = document.getElementById('presets');
+      SCENARIOS.forEach(s => {
+        const b = document.createElement('button');
+        b.className = 'preset'; b.textContent = s.name;
+        b.onclick = () => setInputs({ hr:s.hr, hs:s.hs, ar:s.ar, as:s.as, ad:s.ad });
+        wrap.appendChild(b);
+      });
+    })();
+
+    const chart = echarts.init(document.getElementById('simChart'), 'dark');
+
+    function update() {
+      const i = readInputs();
+      const { ham, ant, margin } = project(i);
+      document.getElementById('hamProj').textContent = 'Hamilton ' + ham;
+      document.getElementById('antProj').textContent = 'Antonelli ' + ant;
+      const v = document.getElementById('verdict');
+      if (margin > 0) { v.textContent = 'HAM champion (+' + margin + ')'; v.style.background = 'rgba(0,215,182,0.18)'; v.style.color = MERC; }
+      else if (margin === 0) { v.textContent = 'Level — decided on countback'; v.style.background = 'rgba(255,180,84,0.18)'; v.style.color = '#ffb454'; }
+      else { v.textContent = 'Antonelli champion (' + margin + ')'; v.style.background = 'rgba(225,6,0,0.18)'; v.style.color = '#ff6b66'; }
+
+      chart.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: 50, right: 30, top: 30, bottom: 30 },
+        xAxis: { type: 'category', data: ['Hamilton', 'Antonelli'] },
+        yAxis: { type: 'value', name: 'Projected final points' },
+        series: [{
+          type: 'bar',
+          barWidth: '46%',
+          label: { show: true, position: 'top', color: '#fff', fontWeight: 'bold', formatter: '{c} pts' },
+          data: [
+            { value: ham, itemStyle: { color: FERRARI } },
+            { value: ant, itemStyle: { color: MERC } },
+          ],
+          markLine: {
+            symbol: 'none',
+            lineStyle: { color: '#ffb454', type: 'dashed' },
+            label: { formatter: 'ANT today (156)', color: '#ffb454' },
+            data: [{ yAxis: ANT_NOW }],
+          },
+        }],
+      });
+    }
+
+    ['hr','hs','ar','as','ad'].forEach(id => document.getElementById(id).addEventListener('change', update));
+    window.addEventListener('resize', () => chart.resize());
+    setInputs(DEFAULTS);
+  </script>
+</body>
+</html>
